@@ -15,10 +15,214 @@ do
   echo ""
 
 	case $input in
-	    [yY][eE][sS]|[yY])
+	    [yY])
             # Install libxft-bgra for the emojis not to crash dwmblocks
 
             mkdir ~/.config
+
+            echo "First, we have to configure your dwmblocks"
+            dwmblocks_config="$(cat dwmblocks_defconf)"
+
+            echo "Do you want volume to be in your dwmblocks [Y/n]"
+            while true
+            do 
+              input=$(head -c 1)
+              echo ""
+              case $input in 
+                [yY])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/VOLUME/{\"🔊\", \"pamixer --get-volume-human\",	5,	10},")
+                  break
+                  ;;
+                [nN])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/VOLUME/\/\/{\"🔊\", \"pamixer --get-volume-human\",	5,	10},")
+                  break
+                  ;;
+                *)
+                  echo "Invalid input"
+                  ;;
+              esac
+            done
+
+            echo "Do you want layout to be in your dwmblocks [Y/n]"
+            while true
+            do 
+              input=$(head -c 1)
+              echo ""
+              case $input in 
+                [yY])
+                  pacaur -S xkblayout-state-git
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/KEYBOARD/{\"🎹\", \"xkblayout-state print '%n'\",	1,		0},/")
+                  break
+                  ;;
+                [nN])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/KEYBOARD/\/\/{\"🎹\", \"xkblayout-state print '%n'\",	1,		0},/")
+                  break
+                  ;;
+                *)
+                  echo "Invalid input"
+                  ;;
+              esac
+            done
+
+            echo "Do you want RAM to be in your dwmblocks [Y/n]"
+            while true
+            do 
+              input=$(head -c 1)
+              echo ""
+              case $input in 
+                [yY])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/RAM/{\"💾\", \"free -h | awk '\/^Mem\/ { print \$3\\\\\"\/\\\\\"\$2 }' | sed s\/i\/\/g\",	10,	0},/")
+                  break
+                  ;;
+                [nN])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/RAM/\/\/{\"💾\", \"free -h | awk '\/^Mem\/ { print \$3\\\\\"\/\\\\\"\$2 }' | sed s\/i\/\/g\",	10,	0},/")
+                  break
+                  ;;
+                *)
+                  echo "Invalid input"
+                  ;;
+              esac
+            done
+
+            echo "Do you want CPU temperature to be in your dwmblocks [Y/n]"
+            while true
+            do 
+              input=$(head -c 1)
+              echo ""
+              case $input in 
+                [yY])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/CPUTEMP/{\"🌡\", \"cputemp\",	5,	0},/")
+                  break
+                  ;;
+                [nN])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/CPUTEMP/\/\/{\"🌡\", \"cputemp\",	5,	0},/")
+                  break
+                  ;;
+                *)
+                  echo "Invalid input"
+                  ;;
+              esac
+            done
+
+            echo "Do you want your GPU temperature to be in your dwmblocks [Y/n]"
+            while true
+            do 
+              input=$(head -c 1)
+              echo ""
+              case $input in 
+                [yY])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/GPUTEMP/{\"🌡\", \"gputemp\",	5,	0},/")
+                  break
+                  ;;
+                [nN])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/GPUTEMP/\/\/{\"🌡\", \"gputemp\",	5,	0},/")
+                  break
+                  ;;
+                *)
+                  echo "Invalid input"
+                  ;;
+              esac
+            done
+
+            echo "Do you want  to be in your dwmblocks [Y/n]"
+            while true
+            do 
+              input=$(head -c 1)
+              echo ""
+              case $input in 
+                [yY])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s//{},/")
+                  break
+                  ;;
+                [nN])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s//\/\/{},/")
+                  break
+                  ;;
+                *)
+                  echo "Invalid input"
+                  ;;
+              esac
+            done
+
+            echo "Do you want  to be in your dwmblocks [Y/n]"
+            while true
+            do 
+              input=$(head -c 1)
+              echo ""
+              case $input in 
+                [yY])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s//{},/")
+                  break
+                  ;;
+                [nN])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s//\/\/{},/")
+                  break
+                  ;;
+                *)
+                  echo "Invalid input"
+                  ;;
+              esac
+            done
+
+            echo "Do you want  to be in your dwmblocks [Y/n]"
+            while true
+            do 
+              input=$(head -c 1)
+              echo ""
+              case $input in 
+                [yY])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s//{},/")
+                  break
+                  ;;
+                [nN])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s//\/\/{},/")
+                  break
+                  ;;
+                *)
+                  echo "Invalid input"
+                  ;;
+              esac
+            done
+
+            echo "Do you want  to be in your dwmblocks [Y/n]"
+            while true
+            do 
+              input=$(head -c 1)
+              echo ""
+              case $input in 
+                [yY])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s//{},/")
+                  break
+                  ;;
+                [nN])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s//\/\/{},/")
+                  break
+                  ;;
+                *)
+                  echo "Invalid input"
+                  ;;
+              esac
+            done
+
+            echo "Do you want  to be in your dwmblocks [Y/n]"
+            while true
+            do 
+              input=$(head -c 1)
+              echo ""
+              case $input in 
+                [yY])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s//{},/")
+                  break
+                  ;;
+                [nN])
+                  dwmblocks_config=$(echo "$dwmblocks_config" | sed "s//\/\/{},/")
+                  break
+                  ;;
+                *)
+                  echo "Invalid input"
+                  ;;
+              esac
+            done
 
             echo "Proceeding to install the dependencies" &&
 
@@ -92,7 +296,7 @@ do
             rm -Rf .config/slock
             echo "Try Again."
             ;;
-	    [nN][oO]|[nN])
+	    [nN])
             echo "Aborting"
             break
 	       		;;
