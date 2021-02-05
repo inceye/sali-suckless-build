@@ -75,6 +75,10 @@ do
             sudo make install &&
             cd .. &&
             cp -r tabbed ~/.config/ &&
+
+            #scripts
+            sudo cp scripts/bin/* /usr/local/bin/ &&
+
             echo "Installation was successfully completed" &&
             break ||
             echo "There was an ERROR while installing some of the utilities."

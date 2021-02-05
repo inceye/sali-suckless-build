@@ -62,3 +62,5 @@ This is my build of the following suckless tools:
 
 * Simple menu [dmenu](dmenu)
     A restiled fork of [LukesmithXYZ's build of dmenu](https://github.com/LukeSmithxyz/dmenu)
+
+This build also has a couple of scripts needed for dwmblock to work correctly.

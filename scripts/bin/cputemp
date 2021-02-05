@@ -1,0 +1,14 @@
+#!/bin/bash
+
+maxtemp=""
+
+maxtemp="-274"
+for i in $(find /sys/devices/platform/coretemp.0/hwmon/*/temp*_input)
+do
+	if (( $maxtemp < $(cat $i) ))
+	then
+		maxtemp=$(cat $i)
+	fi
+done
+
+echo $(($maxtemp / 1000))
