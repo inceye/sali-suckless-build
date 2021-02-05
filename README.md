@@ -1,5 +1,12 @@
-A build of various suckless tools, as well as a script to install and configure them all
+A build of various [suckless](suckless.org) tools, as well as a script to install and configure them all
 ===
+
+To easily install this build of suckless tools, simply, as non-root user and non-root user only, go into the git's root directory and run
+
+``` 
+./deploy 
+```
+---
 
 This is my build of the following suckless tools:
 

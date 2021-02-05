@@ -1,0 +1,102 @@
+#!/bin/sh
+
+echo "This script is going to install several suckless utilities and write their files to your .config directory. 
+If you have directories .config/surf, .config/dmenu, .config/dwm etc. they will be gone.
+You can only run this script as a user, never as root -- otherwize the script is going to fail.
+Do you wish to proceed? [Y/n] 
+WARNING: DO NOT END THIS SCRIPT BY PRESSING CTRL+C AS YOUR icanon SETTINGS WILL BE ALTERED. ONLY EXIT BY PRESSING n" 
+
+saved_tty_settings=$(stty -g)
+stty -icanon min 1 time 0
+
+while true
+do
+  input=$(head -c 1) 
+  echo ""
+
+	case $input in
+	    [yY][eE][sS]|[yY])
+            # Install libxft-bgra for the emojis not to crash dwmblocks
+
+            mkdir ~/.config
+
+            echo "Proceeding to install the dependencies" &&
+
+            # Import gpg key to authorize libxft-bgra
+            gpg --keyserver pool.sks-keyservers.net --recv-key CFDF148828C642A7 &&
+
+            git clone https://aur.archlinux.org/libxft-bgra.git &&
+            cd libxft-bgra &&
+            makepkg -si
+            cd .. &&
+            rm -Rf libxft-bgra &&
+
+            echo "Suckless tools' installation is initiated" &&
+
+            # Install the suckless software
+            #dwm
+            cd dwm &&
+            sudo make install &&
+            cd .. &&
+            cp -r dwm ~/.config/ &&
+
+            #dmenu
+            cd dmenu &&
+            sudo make install &&
+            cd .. &&
+            cp -r dmenu ~/config/ &&
+
+            #st
+            cd st &&
+            sudo make install &&
+            cd .. &&
+            cp -r st ~/config/ &&
+
+            #dwmblocks
+            cd dwmblocks &&
+            sudo make install &&
+            cd .. &&
+            cp -r dwmblocks ~/config/ &&
+
+            #slock
+            cd slock &&
+            sudo make install &&
+            cd .. &&
+            cp -r slock ~/config/ &&
+
+            #surf
+            cd surf &&
+            sudo make install &&
+            cd .. &&
+            cp -r surf ~/.config/ &&
+
+            #tabbed
+            cd tabbed &&
+            sudo make install &&
+            cd .. &&
+            cp -r tabbed ~/.config/ &&
+            echo "Installation was successfully completed" &&
+            break ||
+            echo "There was an ERROR while installing some of the utilities."
+            echo "Removing wrong configuration from .config"
+            rm -Rf .config/tabbed
+            rm -Rf .config/surf
+            rm -Rf .config/st
+            rm -Rf .config/dwm
+            rm -Rf .config/dwmblocks
+            rm -Rf .config/dmenu
+            rm -Rf .config/slock
+            echo "Try Again."
+            ;;
+	    [nN][oO]|[nN])
+            echo "Aborting"
+            break
+	       		;;
+	    *)
+            echo "Invalid input, try again"
+            ;;
+	esac
+done
+
+echo "Restoring original icanon tty settings"
+stty "$saved_tty_settings"
