@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "This script is going to install several suckless utilities and write their files to your .config directory. 
-If you have directories .config/surf, .config/dmenu, .config/dwm etc. they will be gone.
+If you have directories .local/src/surf, .local/src/dmenu, .local/src/dwm etc. they will be gone.
 You can only run this script as a user, never as root -- otherwize the script is going to fail.
 Do you wish to proceed? [Y/n] 
 WARNING: DO NOT END THIS SCRIPT BY PRESSING CTRL+C AS YOUR icanon SETTINGS WILL BE ALTERED. ONLY EXIT BY PRESSING n" 
@@ -19,7 +19,7 @@ do
 	    [yY])
             # Install libxft-bgra for the emojis not to crash dwmblocks
 
-            mkdir ~/.config
+            mkdir -p ~/.local/src/
 
             echo "First, we have to configure your dwmblocks"
             dwmblocks_config="$(cat dwmblocks_defconf)"
@@ -266,43 +266,43 @@ do
             cd dwm &&
             sudo make install &&
             cd .. &&
-            cp -r dwm ~/.config/ &&
+            cp -r dwm ~/.local/src/ &&
 
             #dmenu
             cd dmenu &&
             sudo make install &&
             cd .. &&
-            cp -r dmenu ~/.config/ &&
+            cp -r dmenu ~/.local/src/ &&
 
             #st
             cd st &&
             sudo make install &&
             cd .. &&
-            cp -r st ~/.config/ &&
+            cp -r st ~/.local/src/ &&
 
             #dwmblocks
             cd dwmblocks &&
             sudo make install &&
             cd .. &&
-            cp -r dwmblocks ~/.config/ &&
+            cp -r dwmblocks ~/.local/src/ &&
 
             #slock
             cd slock &&
             sudo make install &&
             cd .. &&
-            cp -r slock ~/.config/ &&
+            cp -r slock ~/.local/src/ &&
 
             #surf
             cd surf &&
             sudo make install &&
             cd .. &&
-            cp -r surf ~/.config/ &&
+            cp -r surf ~/.local/src/ &&
 
             #tabbed
             cd tabbed &&
             sudo make install &&
             cd .. &&
-            cp -r tabbed ~/.config/ &&
+            cp -r tabbed ~/.local/src/ &&
 
             #scripts
             sudo cp scripts/bin/* /usr/local/bin/ &&
@@ -311,13 +311,13 @@ do
             break ||
             echo "There was an ERROR while installing some of the utilities."
             echo "Removing wrong configuration from .config"
-            rm -Rf .config/tabbed
-            rm -Rf .config/surf
-            rm -Rf .config/st
-            rm -Rf .config/dwm
-            rm -Rf .config/dwmblocks
-            rm -Rf .config/dmenu
-            rm -Rf .config/slock
+            rm -Rf .local/src/tabbed
+            rm -Rf .local/src/surf
+            rm -Rf .local/src/st
+            rm -Rf .local/src/dwm
+            rm -Rf .local/src/dwmblocks
+            rm -Rf .local/src/dmenu
+            rm -Rf .local/src/slock
             echo "Try Again?[Y/n]"
             ;;
 	    [nN])
