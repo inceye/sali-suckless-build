@@ -1,12 +1,13 @@
-#!/bin/bash
+#!/bin/sh
 
-maxtemp="-274"
-for i in $(find /sys/class/drm/card0/device/hwmon/*/temp*_input)
+maxtemp="0"
+temps=$(find /sys/class/drm -name "temp*_input" -exec cat {} \;)
+for temp in $temps
 do
-	if (( $maxtemp < $(cat $i) ))
-	then
-		maxtemp=$(cat $i)
-	fi
+  if [ "$maxtemp" -lt "$temp" ]
+  then
+    maxtemp=$temp
+  fi
 done
 
-echo $(( $maxtemp / 1000 ))
+echo $(( maxtemp / 1000 ))
