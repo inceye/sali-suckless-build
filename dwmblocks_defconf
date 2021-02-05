@@ -7,8 +7,7 @@ static const Block blocks[] = {
 	RAM
 	CPUTEMP
 	GPUTEMP
-	DISK
-	BATTERY
+	DISKBATTERY
 	DATE
 	TIME
 };
