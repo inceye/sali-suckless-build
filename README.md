@@ -8,7 +8,7 @@ To easily install this build of suckless tools, simply, as non-root user and non
 ```
 ---
 
-This is my build of the following suckless tools:
+This is [OUR](https://en.wikipedia.org/wiki/Soviet_Union) build of the following suckless tools:
 
 * Browser [Surf](surf)
 
