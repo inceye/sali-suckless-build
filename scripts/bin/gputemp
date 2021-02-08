@@ -1,7 +1,7 @@
 #!/bin/sh
 
 maxtemp="0"
-temps=$(find /sys/class/drm -name "temp*_input" -exec cat {} \;)
+temps=$(find /sys/class/drm/card0/device/hwmon -name "temp*_input" -exec cat {} \;)
 for temp in $temps
 do
   if [ "$maxtemp" -lt "$temp" ]
