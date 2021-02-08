@@ -12,7 +12,7 @@ This is [OUR](https://en.wikipedia.org/wiki/Soviet_Union) build of the following
 
 * Browser [Surf](surf)
 
-    A restiled fork of original [Surf](https://surf.suckless.org/) browser with several
+    A restiled fork of [original Surf browser](https://surf.suckless.org/) with several
     patches:
 
     * [Bookmarks](https://surf.suckless.org/patches/bookmarking/)
@@ -25,10 +25,10 @@ This is [OUR](https://en.wikipedia.org/wiki/Soviet_Union) build of the following
     * [Multiple search engines](https://surf.suckless.org/patches/searchengines/)
     * [Space search - search by typing a space before url](https://surf.suckless.org/patches/spacesearch/)
 
-* Screen locker utility [Slock](slock)
+* Screen locker utility Slock](slock)
 
-    A restiled fork of original [Slock](https://tools.suckless.org/slock/) screen 
-    locker by suckless sith several patches:
+    A restiled fork of [the original Slock screen locker](https://tools.suckless.org/slock/)
+    by suckless sith several patches:
 
     * [Blurred screen as background](https://tools.suckless.org/slock/patches/blur-pixelated-screen/)
     * [Display power manager](https://tools.suckless.org/slock/patches/dpms/)
@@ -41,7 +41,7 @@ This is [OUR](https://en.wikipedia.org/wiki/Soviet_Union) build of the following
 
 * Tab utility to add tabs to any program you want [Tabbed](tabbed)
 
-    A restiled fork of original [tabbed](https://tools.suckless.org/tabbed/) tool by suckless with several patches:
+    A restiled fork of [the original tabbed utility](https://tools.suckless.org/tabbed/) by suckless with several patches:
 
     * [Addition of client number to the tab](https://tools.suckless.org/tabbed/patches/clientnumber/)
     * [Automatic tab hiding when not pressing the keybinds](https://tools.suckless.org/tabbed/patches/hidetabs/)
