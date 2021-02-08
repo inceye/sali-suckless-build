@@ -293,6 +293,7 @@ do
             cp -r slock ~/.local/src/ &&
 
             #surf
+            pacaur -S gst-plugins-good gst-libav
             cd surf &&
             sudo make install &&
             cd .. &&
