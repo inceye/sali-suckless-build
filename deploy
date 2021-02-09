@@ -347,6 +347,7 @@ do
 
       #scripts
       sudo cp scripts/bin/* /usr/local/bin/ &&
+      sudo cp scripts/share/* /usr/local/share/ &&
 
       echo "Installation was successfully completed" &&
       break ||

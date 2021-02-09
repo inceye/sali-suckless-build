@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cd ~/.password-store || (notify-send "ERROR: Password store missing"; exit)
+indir=$(pwd | sed "s/\//\\\\\//g")\\/
+jobdone=""
+while [[ "$(pwd)" == "$HOME/.password-store"* ]]
+do
+	opt="$( ( echo ..; ls ) | dmenu -l 10)" || break
+	[[ "$opt" == *"otp.gpg" ]] &&
+	pass otp -c "$(echo "$(pwd)/$opt" | sed "s/$indir//" | sed "s/.gpg$//")" &&
+	jobdone="true" &&
+	notify-send "One time password for $(echo "$(pwd)/$opt" | sed "s/$indir//" | sed "s/.gpg$//") has been successfully copied to clipboard. It will be cleared in forty-five seconds." &&
+	break
+	[[ "$opt" == *".gpg" ]] &&
+	pass -c "$(echo "$(pwd)/$opt" | sed "s/$indir//" | sed "s/.gpg$//")" &&
+	jobdone="true" &&
+	notify-send "Password for $(echo "$(pwd)/$opt" | sed "s/$indir//" | sed "s/.gpg$//") has been successfully copied to clipboard. It will be cleared in forty-five seconds." &&
+	break
+	cd "$opt" || break
+done
+[[ "$jobdone" == "true" ]] || notify-send "Password copy aborted"

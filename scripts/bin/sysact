@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# A dmenu wrapper script for system functions.
+
+# For non-systemd init systems.
+case "$(readlink -f /sbin/init)" in
+	*runit*) hib="sudo zzz" ;;
+	*openrc*) reb="sudo openrc-shutdown -r"; shut="sudo openrc-shutdown -p" ;;
+esac
+
+cmds="\
+🔒 lock		slock
+⏸️ suspend	systemctl suspend
+🚪 leave dwm	kill -TERM $(pidof -s dwm)
+♻ renew dwm	kill -HUP $(pidof -s dwm)
+🐻 hibernate	${hib:-sudo hibernate}
+🔃 reboot	${reb:-sudo reboot}
+🖥 shutdown	${shut:-sudo shutdown -h now}"
+
+choice="$(echo "$cmds" | cut -d'	' -f 1 | dmenu)" || exit 1
+
+`echo "$cmds" | grep "^$choice	" | cut -d '	' -f2-`

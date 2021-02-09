@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo "Enter name"
+read name
+echo "Enter dpi"
+read dpi
+i=0
+res=""
+while [ "$res" == "" ]
+do
+	id=$(printf "%06d" $i)
+	scanimage --mode Color --format png --resolution=$dpi -p > "$name#$id.png"
+	i=$(($i+1))
+	read res
+done
+
+echo "Do you want to convert dis to pdf file? (y/anything else)"
+read ans
+if [ $ans == y ]
+then
+	convert -density $dpi $name*.png $name.pdf
+fi
