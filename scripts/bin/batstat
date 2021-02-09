@@ -4,16 +4,17 @@ powerinfo=$(upower -i "$1" | sed -e "s/^[ ]*//g" -e "s/ [ ]*/ /g")
 state=$(echo "$powerinfo" | awk '/state:/{print $2}')
 percentage=$(echo "$powerinfo" | awk '/percentage:/{print $2}')
 time=$(echo "$powerinfo" | awk -F: '/time/{print $2}' | awk '{print $1}')
+time_suf=$(echo "$powerinfo" | awk -F: '/time/{print $2}' | awk '{print $2}' | head -c 1)
 
 case $state in
   fully-charged)
-    echo "🔋$2$percentage"
+    echo "🔋$2$percentage (‾)"
     ;;
   charging)
-    echo "⚡$2$percentage $time"
+    echo "⚡$2$percentage $time$time_suf (/‾)"
     ;;
   discharging)
-    echo "🔌$2$percentage $time"
+    echo "🔌$2$percentage $time$time_suf (\\_)"
     ;;
   *)
     ;;
