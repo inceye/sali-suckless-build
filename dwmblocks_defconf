@@ -7,8 +7,7 @@ static const Block blocks[] = {
 	RAM
 	CPUTEMP
 	GPUTEMP
-	DISKBATTERY
-	DATE
+	DISKBATTERYDATE
 	TIME
 };
 //Sets delimiter between status commands. NULL character ('\0') means no delimiter.

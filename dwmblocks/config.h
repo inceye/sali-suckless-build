@@ -10,11 +10,12 @@ static const Block blocks[] = {
 	{"📁/", "df -h \"/\" | grep \"/\" | awk '{print $4}'",	10,	0},
 	{"📁~", "df -h \"/home\" | grep \"/home\" | awk '{print $4}'",	10,	0},
 	{"📁#", "df -h \"/home/archive\" | grep \"/home/archive\" | awk '{print $4}'",	10,	0},
-	//{"", "cat /etc/status/pipes/battery | cut -d ' ' -f 3",	10,		0},
+	{"", "batstat /org/freedesktop/UPower/devices/mouse_hidpp_battery_6 🖱",	10,		0},
+	
 	{"📅", "date '+%Y-%m-%d(%a)'",	5,	0},
 	{"⌚", "date '+%I:%M:%S%p'",	1,	0},
 };
-//Sets delimiter between status commands. NULL character ('\0') means no delimiter.
+//Sets delimiter between status commands. NULL character ('') means no delimiter.
 static char *delim = " ";
 
 // Have dwmblocks automatically recompile and run when you edit this file in

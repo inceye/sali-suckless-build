@@ -38,6 +38,8 @@ do
       rm -Rf .local/src/dmenu
       rm -Rf .local/src/slock
 
+      sudo pacman -S upower
+
       echo "First, we have to configure your dwmblocks"
       dwmblocks_config="$(cat dwmblocks_defconf)"
 
@@ -152,12 +154,12 @@ do
             stty "$saved_tty_settings"
             echo "Making several records for disks, quitting on empty label"
             echo "Enter the disk label to display in status(if empty -- the script will stop adding disks and will go to the next step)"
-            echo "REMEMBER THAT YOU NEED TO ESCAPE EACH / SYMBOL (eg. \\/home)"
+            echo "REMEMBER TO FOLLOW SED ESCAPINGS (eg. \\/home)"
             read -r label
             while [ "$label" != "" ]
             do
               echo "Enter the path to the disk"
-              echo "REMEMBER THAT YOU NEED TO ESCAPE EACH / SYMBOL (eg. \\/home)"
+              echo "REMEMBER TO FOLLOW SED ESCAPINGS (eg. \\/home)"
               read -r path
               dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/DISK/{\"📁$label\", \"df -h \\\\\"$path\\\\\" | grep \\\\\"$path\\\\\" | awk '{print \$4}'\",	10,	0},\n\tDISK/")
               echo "Enter the disk label to display in status(if empty -- the script will stop adding disks and will go to the next step)"
@@ -185,11 +187,30 @@ do
         echo ""
         case $input in 
           [yY])
-            dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/BATTERY/{\"\", \"cat \/etc\/status\/pipes\/battery | cut -d ' ' -f 3\",	10,		0},/")
+            stty "$saved_tty_settings"
+            echo "Making several records for batteries, quitting on empty line number" 
+            echo "List of available batteries:"
+            upower -e | grep "" -n
+            echo "Enter the number of the line, containing the battery you want to be displayed(if empty, then stop adding batteries and go to the next step)"
+            read -r line_number
+            while [ "$line_number" != "" ]
+            do
+              echo "Enter the battery label you want to be displayed"
+              echo "REMEMBER TO FOLLOW SED ESCAPINGS (eg. \\/home)"
+              read -r label
+              path=$(upower -e | head -"$line_number" | tail -1 | sed "s/\//\\\\\//g")
+              dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/BATTERY/{\"\", \"batstat $path $label\",	10,		0},\n\tBATTERY/")
+              echo "List of available batteries:"
+              upower -e | grep "" -n
+              echo "Enter the number of the line, containing the battery you want to be displayed(if empty, then stop adding batteries and go to the next step)"
+              read -r line_number
+            done
+            dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/BATTERY//")
+            stty -icanon min 1 time 0
             break
             ;;
           [nN])
-            dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/BATTERY/\/\/{\"\", \"cat \/etc\/status\/pipes\/battery | cut -d ' ' -f 3\",	10,		0},/")
+            dwmblocks_config=$(echo "$dwmblocks_config" | sed "s/BATTERY/\/\/{\"\", \"batstat PATH LABEL\",	10,		0},\n\t/")
             break
             ;;
           *)
@@ -259,7 +280,7 @@ do
         esac
       done
 
-      [ "$continue" == "" ] &&
+      [ "$continue" = "" ] &&
 
       echo "$dwmblocks_config" > dwmblocks/config.h &&
 
