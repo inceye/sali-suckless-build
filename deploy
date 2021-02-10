@@ -28,6 +28,7 @@ do
 
       echo ""
       mkdir -p ~/.local/src/
+      mkdir -p ~/.local/share/
 
       echo "Removing old configuration from .local"
       rm -Rf .local/src/tabbed
@@ -346,8 +347,11 @@ do
       cp -r tabbed ~/.local/src/ &&
 
       #scripts
-      sudo cp scripts/bin/* /usr/local/bin/ &&
-      sudo cp scripts/share/* /usr/local/share/ &&
+      cp scripts/bin/* ~/.local/bin/ &&
+      cp scripts/share/* ~/.local/share/ &&
+      
+      # add ~/.local/bin to the PATH variable
+      export PATH="$PATH:$HOME/.local/bin"
 
       echo "Installation was successfully completed" &&
       break ||
