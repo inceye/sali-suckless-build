@@ -2,6 +2,7 @@ dmenu/dmenu
 dmenu/dmenu.o
 dmenu/drw.o
 dmenu/stest.o
+dmenu/stest
 dmenu/util.o
 dwm/drw.o
 dwm/dwm
@@ -16,6 +17,7 @@ st/boxdraw.o
 st/hb.o
 st/st
 st/st.o
+st/x.o
 surf/surf
 surf/surf.o
 surf/webext-surf.o
@@ -23,3 +25,4 @@ surf/webext-surf.so
 tabbed/tabbed
 tabbed/tabbed.o
 tabbed/xembed.o
+tabbed/xembed
