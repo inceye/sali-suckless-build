@@ -12,7 +12,7 @@ This is [OUR](https://en.wikipedia.org/wiki/Soviet_Union) build of the following
 
 * Browser [Surf](surf)
 
-    A restiled fork of [original Surf browser](https://surf.suckless.org/) with several
+    A restyled fork of [original Surf browser](https://surf.suckless.org/) with several
     patches:
 
     * [Bookmarks](https://surf.suckless.org/patches/bookmarking/)
@@ -27,8 +27,8 @@ This is [OUR](https://en.wikipedia.org/wiki/Soviet_Union) build of the following
 
 * Screen locker utility Slock](slock)
 
-    A restiled fork of [the original Slock screen locker](https://tools.suckless.org/slock/)
-    by suckless sith several patches:
+    A restyled fork of [the original Slock screen locker](https://tools.suckless.org/slock/)
+    by suckless with several patches:
 
     * [Blurred screen as background](https://tools.suckless.org/slock/patches/blur-pixelated-screen/)
     * [Display power manager](https://tools.suckless.org/slock/patches/dpms/)
@@ -41,7 +41,7 @@ This is [OUR](https://en.wikipedia.org/wiki/Soviet_Union) build of the following
 
 * Tab utility to add tabs to any program you want [Tabbed](tabbed)
 
-    A restiled fork of [the original tabbed utility](https://tools.suckless.org/tabbed/) by suckless with several patches:
+    A restyled fork of [the original tabbed utility](https://tools.suckless.org/tabbed/) by suckless with several patches:
 
     * [Addition of client number to the tab](https://tools.suckless.org/tabbed/patches/clientnumber/)
     * [Automatic tab hiding when not pressing the keybinds](https://tools.suckless.org/tabbed/patches/hidetabs/)
@@ -49,18 +49,18 @@ This is [OUR](https://en.wikipedia.org/wiki/Soviet_Union) build of the following
  
 * Window manager [DWM](dwm)
 
-    A restiled fork of [LukeSmithXYZ's build of DWM](https://github.com/LukeSmithxyz/dwm) with two patches:
+    A restyled fork of [LukeSmithXYZ's build of DWM](https://github.com/LukeSmithxyz/dwm) with two patches:
 
     * [Unique settings for different tags](https://dwm.suckless.org/patches/pertag/)
     * [Display status on all connected monitors](https://dwm.suckless.org/patches/statusallmons/)
 
 * Status for it [DWMBlocks](dwmblocks)
-    A restiled fork of [LukesmithXYZ's build of DWMblocks](https://github.com/lukesmithxyz/dwmblocks), with a couple of my own scripts
+    A restyled fork of [LukesmithXYZ's build of DWMblocks](https://github.com/lukesmithxyz/dwmblocks), with a couple of my own scripts
 
 * Terminal emulator [ST](st)
-    A restiled fork of [LukesmithXYZ's build of ST](https://github.com/LukeSmithxyz/st)
+    A restyled fork of [LukesmithXYZ's build of ST](https://github.com/LukeSmithxyz/st)
 
 * Simple menu [dmenu](dmenu)
-    A restiled fork of [LukesmithXYZ's build of dmenu](https://github.com/LukeSmithxyz/dmenu)
+    A restyled fork of [LukesmithXYZ's build of dmenu](https://github.com/LukeSmithxyz/dmenu)
 
 This build also has a couple of scripts needed for dwmblock to work correctly.
