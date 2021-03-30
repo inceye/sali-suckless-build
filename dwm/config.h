@@ -233,6 +233,7 @@ static Key keys[] = {
     { MODKEY,			    XK_w,		    spawn,		    SHCMD("$BROWSER") },
     { MODKEY,			    XK_o,			spawn,		    SHCMD("dmenupass") },
     { MODKEY,			    XK_r,			spawn,		    SHCMD(TERMINAL " -e ranger") },
+    { MODKEY,			    XK_e,			spawn,		    SHCMD(TERMINAL " -e ranger ~/Downloads/Surf") },
     { MODKEY,			    XK_apostrophe,	togglescratch,	{.ui = 1} },
     { MODKEY|ShiftMask,		XK_Return,	    togglescratch,	{.ui = 0} },
 
