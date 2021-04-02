@@ -25,7 +25,7 @@ This is [OUR](https://en.wikipedia.org/wiki/Soviet_Union) build of the following
     * [Multiple search engines](https://surf.suckless.org/patches/searchengines/)
     * [Space search - search by typing a space before url](https://surf.suckless.org/patches/spacesearch/)
 
-* Screen locker utility Slock](slock)
+* Screen locker utility [Slock](slock)
 
     A restyled fork of [the original Slock screen locker](https://tools.suckless.org/slock/)
     by suckless with several patches:
