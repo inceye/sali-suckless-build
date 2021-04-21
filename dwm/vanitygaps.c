@@ -16,6 +16,7 @@ static void centeredfloatingmaster(Monitor *m);
 static void deck(Monitor *m);
 static void dwindle(Monitor *m);
 static void fibonacci(Monitor *m, int s);
+static void grid(Monitor *m);
 static void spiral(Monitor *m);
 static void tile(Monitor *);
 
@@ -416,6 +417,55 @@ deck(Monitor *m)
 			resize(c, sx, sy, sw - (2*c->bw), sh - (2*c->bw), 0);
 		}
 }
+
+
+/*
+ * Gapless grid but with gaps
+ * https://dwm.suckless.org/patches/gaplessgrid/
+ */
+
+void
+grid(Monitor *m) {
+    unsigned int n, cols, rows, cn, rn, i, cx, cy, cw, ch;
+    Client *c;
+
+	int oh, ov, ih, iv;
+	getgaps(m, &oh, &ov, &ih, &iv, &n);
+
+    if(n == 0)
+        return;
+
+    /* grid dimensions */
+    for(cols = 0; cols <= n/2; cols++)
+        if(cols*cols >= n)
+            break;
+    if(n == 5) /* set layout against the general calculation: not 1:2:2, but 2:3 */
+        cols = 2;
+    rows = n/cols;
+
+    /* window geometries */
+    cw = cols ? 
+        (m->ww - 2 * oh - (cols - 1) * ih) / cols : 
+        (m->ww - 2 * oh);
+    cn = 0; /* current column number */
+    rn = 0; /* current row number */
+    for(i = 0, c = nexttiled(m->clients); c; i++, c = nexttiled(c->next)) {
+        if(i/rows + 1 > cols - n%cols)
+            rows = n/cols + 1;
+        ch = rows ? 
+            (m->wh - 2 * ov - (rows - 1) * iv) / rows : 
+            (m->wh - 2 * ov);
+        cx = m->wx + cn * cw + oh + ih * cn;
+        cy = m->wy + rn * ch + ov + iv * rn;
+        resize(c, cx, cy, cw - 2 * c->bw, ch - 2 * c->bw, False);
+        rn++;
+        if(rn >= rows) {
+            rn = 0;
+            cn++;
+        }
+    }
+}
+
 
 /*
  * Fibonacci layout + gaps

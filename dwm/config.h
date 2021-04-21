@@ -79,7 +79,7 @@ static const Layout layouts[] = {
     { "|M|",	centeredmaster },		/* Master in middle, slaves on sides */
     { ">M>",	centeredfloatingmaster },	/* Same but master floats */
 
-    { "###",    gaplessgrid },
+    { "###",    grid },
 
     { "><>",	NULL },			/* no layout function means floating behavior */
     { NULL,		NULL },
