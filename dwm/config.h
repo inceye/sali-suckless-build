@@ -79,6 +79,8 @@ static const Layout layouts[] = {
     { "|M|",	centeredmaster },		/* Master in middle, slaves on sides */
     { ">M>",	centeredfloatingmaster },	/* Same but master floats */
 
+    { "###",    gaplessgrid },
+
     { "><>",	NULL },			/* no layout function means floating behavior */
     { NULL,		NULL },
 };
@@ -178,8 +180,8 @@ static Key keys[] = {
     { MODKEY,			    XK_y,		    setlayout,	    {.v = &layouts[4]} }, /* monocle */
     { MODKEY|ShiftMask,		XK_y,		    setlayout,	    {.v = &layouts[5]} }, /* deck */
     { MODKEY,			    XK_u,		    setlayout,	    {.v = &layouts[6]} }, /* centeredmaster */
-    { MODKEY|ShiftMask,		XK_u,		    setlayout,	    {.v = &layouts[7]} }, /* centeredfloatingmaster */
-    { MODKEY|ShiftMask,		XK_f,		    setlayout,	    {.v = &layouts[8]} }, /* all floating */
+    { MODKEY|ShiftMask,		XK_u,		    setlayout,	    {.v = &layouts[8]} }, /* centeredfloatingmaster */
+    { MODKEY|ShiftMask,		XK_f,		    setlayout,	    {.v = &layouts[9]} }, /* all floating */
 
     { MODKEY|ShiftMask,		XK_space,	    togglefloating,	{0} },
     { MODKEY,			    XK_f,		    togglefullscr,	{0} },
