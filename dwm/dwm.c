@@ -259,6 +259,8 @@ static void sigterm(int unused);
 static void spawn(const Arg *arg);
 static int stackpos(const Arg *arg);
 static void tag(const Arg *arg);
+static void tagdefaults(const Arg *arg);
+static void tagdefaultssys(Monitor *m);
 static void tagmon(const Arg *arg);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
@@ -337,11 +339,13 @@ static Window root, wmcheckwin;
 static xcb_connection_t *xcon;
 
 struct TagTree {
+    unsigned int tag;
     int nmaster; /* number of windows in master area */
     float mfact; /* mfact */
-    unsigned int sellt; /* selected layout */
-    const Layout *ltidx[2]; /* matrix of tags and layouts indexes  */
     int showbar; /* display bar for the current tag */
+    unsigned int start_layout;
+    const Layout *ltidx[2]; /* matrix of tags and layouts indexes  */
+    unsigned int sellt; /* selected layout */
     bool is_init;
     TagTree *children[2];
 };
@@ -802,7 +806,6 @@ copyvalidchars(char *text, char *rawtext)
 createmon(void)
 {
     Monitor *m;
-    unsigned int i;
 
     m = ecalloc(1, sizeof(Monitor));
     m->tagset[0] = m->tagset[1] = 1;
@@ -820,14 +823,13 @@ createmon(void)
     m->pertag = ecalloc(1, sizeof(Pertag));
     m->pertag->curtag = m->pertag->prevtag = 1;
 
-    m->pertag->root = ecalloc(1, sizeof(TagTree));
-
-    for (i = 0; i <= LENGTH(tags); i++) {
-        m->tagset[m->seltags] = (1 << i) >> 1;
-        gettag(m);
-    }
-
-    m->tagset[m->seltags] = 1;
+    tagdefaultssys(m);
+    TagTree *curtag = gettag(m);
+    m->mfact = curtag->mfact;
+    m->nmaster = curtag->nmaster;
+    m->showbar = curtag->showbar;
+    m->lt[0] = curtag->ltidx[0];
+    m->lt[1] = curtag->ltidx[1];
 
     return m;
 }
@@ -971,7 +973,22 @@ expose(XEvent *e)
         drawbar(m);
 }
 
-    void
+void
+freetag(TagTree *t) 
+{
+    if (t->children[0]) {
+        freetag(t->children[0]);
+        free(t->children[0]);
+        t->children[0] = NULL;
+    }
+    if (t->children[1]) {
+        freetag(t->children[1]);
+        free(t->children[1]);
+        t->children[1] = NULL;
+    }
+}
+
+        void
 focus(Client *c)
 {
     if (!c || !ISVISIBLE(c))
@@ -1077,7 +1094,8 @@ getrootptr(int *x, int *y)
 
 TagTree *
 gettag(Monitor *m) {
-    int curtagnum = m->tagset[m->seltags];
+    unsigned int curtagnum = m->tagset[m->seltags];
+    unsigned int tagnum = curtagnum;
     TagTree *curtag = m->pertag->root;
     while (curtagnum) {
         if (!curtag->children[curtagnum & 1]) {
@@ -1086,17 +1104,27 @@ gettag(Monitor *m) {
             curtag->children[curtagnum & 1]->children[0] = NULL;
             curtag->children[curtagnum & 1]->children[1] = NULL;
 
+#if START_DEFAULT
+            curtag->children[curtagnum & 1]->nmaster = default_tag.nmaster;
+            curtag->children[curtagnum & 1]->mfact = default_tag.mfact;
+
+            curtag->children[curtagnum & 1]->ltidx[0] = &layouts[default_tag.start_layout];
+            curtag->children[curtagnum & 1]->ltidx[1] = &layouts[default_tag.start_layout];
+            curtag->children[curtagnum & 1]->showbar = default_tag.showbar;
+#else
             curtag->children[curtagnum & 1]->nmaster = m->nmaster;
             curtag->children[curtagnum & 1]->mfact = m->mfact;
 
             curtag->children[curtagnum & 1]->ltidx[0] = m->lt[0];
             curtag->children[curtagnum & 1]->ltidx[1] = m->lt[1];
-            curtag->children[curtagnum & 1]->sellt = m->sellt;
 
             curtag->children[curtagnum & 1]->showbar = m->showbar;
+#endif
+            curtag->children[curtagnum & 1]->sellt = m->sellt;
 
             if (curtagnum <= 1) {
                 curtag->children[curtagnum & 1]->is_init = true;
+                curtag->tag = tagnum;
             } else {
                 curtag->children[curtagnum & 1]->is_init = false;
             }
@@ -1105,16 +1133,33 @@ gettag(Monitor *m) {
         curtagnum >>= 1;
     }
     if (!curtag->is_init) {
+#if START_DEFAULT
+        curtag->nmaster = default_tag->nmaster;
+        curtag->mfact = default_tag->mfact;
+
+        curtag->ltidx[0] = default_tag->lt[0];
+        if (!curtag->ltidx[0]) {
+            curtag->ltidx[0] = m->lt[0];
+        }
+        curtag->ltidx[1] = default_tag->lt[1];
+        if (!curtag->ltidx[1]) {
+            curtag->ltidx[1] = m->lt[1];
+        }
+
+        curtag->showbar = default_tag->showbar;
+#else
         curtag->nmaster = m->nmaster;
         curtag->mfact = m->mfact;
 
         curtag->ltidx[0] = m->lt[0];
         curtag->ltidx[1] = m->lt[1];
-        curtag->sellt = m->sellt;
 
         curtag->showbar = m->showbar;
+#endif
 
+        curtag->sellt = m->sellt;
         curtag->is_init = true;
+        curtag->tag = tagnum;
     }
     return curtag;
 }
@@ -2043,6 +2088,35 @@ tag(const Arg *arg)
         focus(NULL);
         arrange(selmon);
     }
+}
+
+    void
+tagdefaults(const Arg *arg) 
+{
+    tagdefaultssys(selmon);
+    arrange(selmon);
+}
+
+    void
+tagdefaultssys(Monitor *m) 
+{
+    unsigned int tmptag = m->tagset[m->seltags];
+    if (m->pertag->root) {
+        freetag(m->pertag->root);
+        free(m->pertag->root);
+        m->pertag->root = NULL;
+    }
+    m->pertag->root = ecalloc(1, sizeof(TagTree));
+    for (int i = 0; i < LENGTH(tags_defaults); i++) {
+        m->tagset[m->seltags] = tags_defaults[i].tag & TAGMASK;
+        TagTree *t = gettag(m);
+        t->nmaster = tags_defaults[i].nmaster;
+        t->mfact = tags_defaults[i].mfact;
+        t->showbar = tags_defaults[i].showbar;
+        t->ltidx[0] = &layouts[tags_defaults[i].start_layout];
+        t->ltidx[1] = &layouts[tags_defaults[i].start_layout];
+    }
+    m->tagset[m->seltags] = tmptag;
 }
 
     void

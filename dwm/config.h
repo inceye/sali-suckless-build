@@ -85,6 +85,24 @@ static const Layout layouts[] = {
     { NULL,		NULL },
 };
 
+#define START_DEFAULT 0
+static const TagTree default_tag = 
+{ 0,      nmaster,    mfact,      showbar,   0 };
+
+static const TagTree tags_defaults[] = {
+    /*  tag     nmaster     mfact       showbar     layout*/
+    { ~0,       nmaster,    mfact,      0,          8 },
+    { 1,        nmaster,    mfact,      showbar,    0 },
+    { 2,        nmaster,    mfact,      showbar,    0 },
+    { 4,        nmaster,    mfact,      showbar,    0 },
+    { 8,        nmaster,    mfact,      showbar,    0 },
+    { 16,       nmaster,    mfact,      showbar,    0 },
+    { 32,       nmaster,    mfact,      showbar,    0 },
+    { 64,       nmaster,    mfact,      showbar,    0 },
+    { 128,      nmaster,    mfact,      showbar,    0 },
+    { 256,      nmaster,    mfact,      showbar,    0 },
+};
+
 /* key definitions */
 #define MODKEY Mod1Mask
 #define TAGKEYS(KEY,TAG) \
