@@ -2,6 +2,10 @@
 
 while :
 do
+    if [ "$(pgrep ^dwmblocks$)" != "" ]
+    then
+        break
+    fi
     dwmblocks
     notify-send "DWMBlocks has failed. Exit code: $?. Restarting in 10 seconds"
     sleep 10 #prevent notify-send spam

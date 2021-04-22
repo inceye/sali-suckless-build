@@ -24,6 +24,7 @@
 #include <locale.h>
 #include <signal.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -109,6 +110,7 @@ typedef struct {
     const Arg arg;
 } Button;
 
+typedef struct TagTree TagTree;
 typedef struct Pertag Pertag;
 typedef struct Monitor Monitor;
 typedef struct Client Client;
@@ -209,6 +211,7 @@ static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Atom getatomprop(Client *c, Atom prop);
 static int getrootptr(int *x, int *y);
+static TagTree *gettag(Monitor *m);
 static long getstate(Window w);
 static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, int focused);
@@ -333,16 +336,22 @@ static Window root, wmcheckwin;
 
 static xcb_connection_t *xcon;
 
+struct TagTree {
+    int nmaster; /* number of windows in master area */
+    float mfact; /* mfact */
+    unsigned int sellt; /* selected layout */
+    const Layout *ltidx[2]; /* matrix of tags and layouts indexes  */
+    int showbar; /* display bar for the current tag */
+    bool is_init;
+    TagTree *children[2];
+};
+
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
 struct Pertag {
     unsigned int curtag, prevtag; /* current and previous tag */
-    int nmasters[LENGTH(tags) + 1]; /* number of windows in master area */
-    float mfacts[LENGTH(tags) + 1]; /* mfacts per tag */
-    unsigned int sellts[LENGTH(tags) + 1]; /* selected layouts */
-    const Layout *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
-    int showbars[LENGTH(tags) + 1]; /* display bar for the current tag */
+    TagTree *root;
 };
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
@@ -811,16 +820,14 @@ createmon(void)
     m->pertag = ecalloc(1, sizeof(Pertag));
     m->pertag->curtag = m->pertag->prevtag = 1;
 
+    m->pertag->root = ecalloc(1, sizeof(TagTree));
+
     for (i = 0; i <= LENGTH(tags); i++) {
-        m->pertag->nmasters[i] = m->nmaster;
-        m->pertag->mfacts[i] = m->mfact;
-
-        m->pertag->ltidxs[i][0] = m->lt[0];
-        m->pertag->ltidxs[i][1] = m->lt[1];
-        m->pertag->sellts[i] = m->sellt;
-
-        m->pertag->showbars[i] = m->showbar;
+        m->tagset[m->seltags] = (1 << i) >> 1;
+        gettag(m);
     }
+
+    m->tagset[m->seltags] = 1;
 
     return m;
 }
@@ -1068,6 +1075,50 @@ getrootptr(int *x, int *y)
     return XQueryPointer(dpy, root, &dummy, &dummy, x, y, &di, &di, &dui);
 }
 
+TagTree *
+gettag(Monitor *m) {
+    int curtagnum = m->tagset[m->seltags];
+    TagTree *curtag = m->pertag->root;
+    while (curtagnum) {
+        if (!curtag->children[curtagnum & 1]) {
+            curtag->children[curtagnum & 1] = ecalloc(1, sizeof(TagTree));
+
+            curtag->children[curtagnum & 1]->children[0] = NULL;
+            curtag->children[curtagnum & 1]->children[1] = NULL;
+
+            curtag->children[curtagnum & 1]->nmaster = m->nmaster;
+            curtag->children[curtagnum & 1]->mfact = m->mfact;
+
+            curtag->children[curtagnum & 1]->ltidx[0] = m->lt[0];
+            curtag->children[curtagnum & 1]->ltidx[1] = m->lt[1];
+            curtag->children[curtagnum & 1]->sellt = m->sellt;
+
+            curtag->children[curtagnum & 1]->showbar = m->showbar;
+
+            if (curtagnum <= 1) {
+                curtag->children[curtagnum & 1]->is_init = true;
+            } else {
+                curtag->children[curtagnum & 1]->is_init = false;
+            }
+        }
+        curtag = curtag->children[curtagnum & 1];
+        curtagnum >>= 1;
+    }
+    if (!curtag->is_init) {
+        curtag->nmaster = m->nmaster;
+        curtag->mfact = m->mfact;
+
+        curtag->ltidx[0] = m->lt[0];
+        curtag->ltidx[1] = m->lt[1];
+        curtag->sellt = m->sellt;
+
+        curtag->showbar = m->showbar;
+
+        curtag->is_init = true;
+    }
+    return curtag;
+}
+
     long
 getstate(Window w)
 {
@@ -1153,16 +1204,9 @@ grabkeys(void)
     void
 incnmaster(const Arg *arg)
 {
-    unsigned int i;
     selmon->nmaster = MAX(selmon->nmaster + arg->i, 0);
-    for(i=0; i<LENGTH(tags); ++i)
-        if(selmon->tagset[selmon->seltags] & 1<<i)
-            selmon->pertag->nmasters[i+1] = selmon->nmaster;
-
-    if(selmon->pertag->curtag == 0)
-    {
-        selmon->pertag->nmasters[0] = selmon->nmaster;
-    }
+    TagTree *seltag = gettag(selmon);
+    seltag->nmaster = selmon->nmaster;
     arrange(selmon);
 }
 
@@ -1790,25 +1834,15 @@ stackpos(const Arg *arg) {
     void
 setlayout(const Arg *arg)
 {
-    unsigned int i;
     if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt])
         selmon->sellt ^= 1;
     if (arg && arg->v)
         selmon->lt[selmon->sellt] = (Layout *)arg->v;
     strncpy(selmon->ltsymbol, selmon->lt[selmon->sellt]->symbol, sizeof selmon->ltsymbol);
 
-    for(i=0; i<LENGTH(tags); ++i)
-        if(selmon->tagset[selmon->seltags] & 1<<i)
-        {
-            selmon->pertag->ltidxs[i+1][selmon->sellt] = selmon->lt[selmon->sellt];
-            selmon->pertag->sellts[i+1] = selmon->sellt;
-        }
-
-    if(selmon->pertag->curtag == 0)
-    {
-        selmon->pertag->ltidxs[0][selmon->sellt] = selmon->lt[selmon->sellt];
-        selmon->pertag->sellts[0] = selmon->sellt;
-    }
+    TagTree *seltag = gettag(selmon);
+    seltag->ltidx[selmon->sellt] = selmon->lt[selmon->sellt];
+    seltag->sellt = selmon->sellt;
 
     if (selmon->sel)
         arrange(selmon);
@@ -1821,7 +1855,6 @@ setlayout(const Arg *arg)
 setmfact(const Arg *arg)
 {
     float f;
-    unsigned int i;
 
     if (!arg || !selmon->lt[selmon->sellt]->arrange)
         return;
@@ -1831,14 +1864,8 @@ setmfact(const Arg *arg)
     if (f < 0.05 || f > 0.95)
         return;
     selmon->mfact = f;
-    for(i=0; i<LENGTH(tags); ++i)
-        if(selmon->tagset[selmon->seltags] & 1<<i)
-            selmon->pertag->mfacts[i+1] = f;
-
-    if(selmon->pertag->curtag == 0)
-    {
-        selmon->pertag->mfacts[0] = f;
-    }
+    TagTree *seltag = gettag(selmon);
+    seltag->mfact = f;
     arrange(selmon);
 }
 
@@ -2029,16 +2056,9 @@ tagmon(const Arg *arg)
     void
 togglebar(const Arg *arg)
 {
-    unsigned int i;
     selmon->showbar = !selmon->showbar;
-    for(i=0; i<LENGTH(tags); ++i)
-        if(selmon->tagset[selmon->seltags] & 1<<i)
-            selmon->pertag->showbars[i+1] = selmon->showbar;
-
-    if(selmon->pertag->curtag == 0)
-    {
-        selmon->pertag->showbars[0] = selmon->showbar;
-    }
+    TagTree *seltag = gettag(selmon);
+    seltag->showbar = selmon->showbar;
     updatebarpos(selmon);
     XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh);
     arrange(selmon);
@@ -2136,14 +2156,16 @@ toggleview(const Arg *arg)
             selmon->pertag->curtag = i + 1;
         }
 
-        /* apply settings for this view */
-        selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
-        selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
-        selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
-        selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
-        selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+        TagTree *seltag = gettag(selmon);
 
-        if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
+        /* apply settings for this view */
+        selmon->nmaster = seltag->nmaster;
+        selmon->mfact = seltag->mfact;
+        selmon->sellt = seltag->sellt;
+        selmon->lt[selmon->sellt] = seltag->ltidx[selmon->sellt];
+        selmon->lt[selmon->sellt^1] = seltag->ltidx[selmon->sellt^1];
+
+        if (selmon->showbar != seltag->showbar)
             togglebar(NULL);
 
         focus(NULL);
@@ -2483,13 +2505,15 @@ view(const Arg *arg)
         selmon->pertag->curtag = tmptag;
     }
 
-    selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
-    selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
-    selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
-    selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
-    selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+    TagTree *seltag = gettag(selmon);
 
-    if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
+    selmon->nmaster = seltag->nmaster;
+    selmon->mfact = seltag->mfact;
+    selmon->sellt = seltag->sellt;
+    selmon->lt[selmon->sellt] = seltag->ltidx[selmon->sellt];
+    selmon->lt[selmon->sellt^1] = seltag->ltidx[selmon->sellt^1];
+
+    if (selmon->showbar != seltag->showbar)
         togglebar(NULL);
 
     focus(NULL);
