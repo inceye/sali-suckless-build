@@ -169,6 +169,8 @@ static Key keys[] = {
     { MODKEY,			    XK_Page_Down,	shiftview,	    { .i = +1 } },
     { MODKEY|ShiftMask,		XK_Page_Down,	shifttag,	    { .i = +1 } },
 
+    { MODKEY|ShiftMask,     XK_v,           winview,        {0} },
+
     /*************************************************************************/
     /*                           MONITOR KEYS                                */
     /*************************************************************************/
@@ -319,7 +321,7 @@ static Button buttons[] = {
 #endif
     { ClkStatusText,        ShiftMask,      Button3,        spawn,          SHCMD(TERMINAL " -e nvim ~/.local/src/dwmblocks/config.h") },
     { ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
-    { ClkClientWin,         MODKEY,         Button2,        defaultgaps,	{0} },
+    { ClkClientWin,         MODKEY,         Button2,        winview,	    {0} },
     { ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
     { ClkClientWin,		    MODKEY,		    Button4,	    incrgaps,	    {.i = +1} },
     { ClkClientWin,		    MODKEY,		    Button5,	    incrgaps,	    {.i = -1} },
