@@ -197,6 +197,7 @@ static void configurenotify(XEvent *e);
 static void configurerequest(XEvent *e);
 static void copyvalidchars(char *text, char *rawtext);
 static Monitor *createmon(void);
+static void defaultgaps(const Arg *arg);
 static void destroynotify(XEvent *e);
 static void detach(Client *c);
 static void detachstack(Client *c);
@@ -210,6 +211,7 @@ static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Atom getatomprop(Client *c, Atom prop);
+static void getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc);
 static int getrootptr(int *x, int *y);
 static TagTree *gettag(Monitor *m);
 static long getstate(Window w);
@@ -217,6 +219,13 @@ static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, int focused);
 static void grabkeys(void);
 static void incnmaster(const Arg *arg);
+static void incrgaps(const Arg *arg);
+static void incrigaps(const Arg *arg);
+static void incrogaps(const Arg *arg);
+static void incrohgaps(const Arg *arg);
+static void incrovgaps(const Arg *arg);
+static void incrihgaps(const Arg *arg);
+static void incrivgaps(const Arg *arg);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
 static void loadxrdb(void);
@@ -244,6 +253,7 @@ static void sendmon(Client *c, Monitor *m);
 static void setclientstate(Client *c, long state);
 static void setfocus(Client *c);
 static void setfullscreen(Client *c, int fullscreen);
+static void setgaps(int oh, int ov, int ih, int iv);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setup(void);
@@ -267,6 +277,7 @@ static void togglefloating(const Arg *arg);
 static void togglescratch(const Arg *arg);
 static void togglesticky(const Arg *arg);
 static void togglefullscr(const Arg *arg);
+static void togglegaps(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
@@ -299,6 +310,7 @@ static pid_t winpid(Window w);
 
 
 /* variables */
+static int enablegaps = 1;
 static const char broken[] = "broken";
 static char stext[256];
 static char rawstext[256];
@@ -339,13 +351,18 @@ static Window root, wmcheckwin;
 static xcb_connection_t *xcon;
 
 struct TagTree {
-    unsigned int tag;
-    int nmaster; /* number of windows in master area */
-    float mfact; /* mfact */
-    int showbar; /* display bar for the current tag */
-    unsigned int start_layout;
-    const Layout *ltidx[2]; /* matrix of tags and layouts indexes  */
-    unsigned int sellt; /* selected layout */
+    unsigned int tag;           /* tag for the defaults initialization */
+    int mnum;                   /* number of the monitor for defaults initialization */
+    int nmaster;                /* number of windows in master area */
+    float mfact;                /* mfact */
+    int showbar;                /* display bar for the current tag */
+    unsigned int start_layout;  /* layout for defaults initialization */
+    int gappih;                 /* horizontal gap between windows */
+    int gappiv;                 /* vertical gap between windows */
+    int gappoh;                 /* horizontal outer gaps */
+    int gappov;                 /* vertical outer gaps */
+    const Layout *ltidx[2];     /* matrix of tags and layouts indexes  */
+    unsigned int sellt;         /* selected layout */
     bool is_init;
     TagTree *children[2];
 };
@@ -823,15 +840,13 @@ createmon(void)
     m->pertag = ecalloc(1, sizeof(Pertag));
     m->pertag->curtag = m->pertag->prevtag = 1;
 
-    tagdefaultssys(m);
-    TagTree *curtag = gettag(m);
-    m->mfact = curtag->mfact;
-    m->nmaster = curtag->nmaster;
-    m->showbar = curtag->showbar;
-    m->lt[0] = curtag->ltidx[0];
-    m->lt[1] = curtag->ltidx[1];
-
     return m;
+}
+
+static void
+defaultgaps(const Arg *arg)
+{
+	setgaps(gappoh, gappov, gappih, gappiv);
 }
 
     void
@@ -1068,6 +1083,25 @@ getatomprop(Client *c, Atom prop)
     return atom;
 }
 
+static void
+getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc)
+{
+	unsigned int n, oe, ie;
+	oe = ie = enablegaps;
+	Client *c;
+
+	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+	if (smartgaps && n == 1) {
+		oe = 0; // outer gaps disabled when only one client
+	}
+
+	*oh = m->gappoh*oe; // outer horizontal gap
+	*ov = m->gappov*oe; // outer vertical gap
+	*ih = m->gappih*ie; // inner horizontal gap
+	*iv = m->gappiv*ie; // inner vertical gap
+	*nc = n;            // number of clients
+}
+
 #ifndef __OpenBSD__
     int
 getdwmblockspid()
@@ -1104,49 +1138,25 @@ gettag(Monitor *m) {
             curtag->children[curtagnum & 1]->children[0] = NULL;
             curtag->children[curtagnum & 1]->children[1] = NULL;
 
-#if START_DEFAULT
-            curtag->children[curtagnum & 1]->nmaster = default_tag.nmaster;
-            curtag->children[curtagnum & 1]->mfact = default_tag.mfact;
-
-            curtag->children[curtagnum & 1]->ltidx[0] = &layouts[default_tag.start_layout];
-            curtag->children[curtagnum & 1]->ltidx[1] = &layouts[default_tag.start_layout];
-            curtag->children[curtagnum & 1]->showbar = default_tag.showbar;
-#else
-            curtag->children[curtagnum & 1]->nmaster = m->nmaster;
-            curtag->children[curtagnum & 1]->mfact = m->mfact;
-
-            curtag->children[curtagnum & 1]->ltidx[0] = m->lt[0];
-            curtag->children[curtagnum & 1]->ltidx[1] = m->lt[1];
-
-            curtag->children[curtagnum & 1]->showbar = m->showbar;
-#endif
-            curtag->children[curtagnum & 1]->sellt = m->sellt;
-
-            if (curtagnum <= 1) {
-                curtag->children[curtagnum & 1]->is_init = true;
-                curtag->tag = tagnum;
-            } else {
-                curtag->children[curtagnum & 1]->is_init = false;
-            }
+            curtag->children[curtagnum & 1]->is_init = false;
         }
         curtag = curtag->children[curtagnum & 1];
         curtagnum >>= 1;
     }
     if (!curtag->is_init) {
 #if START_DEFAULT
-        curtag->nmaster = default_tag->nmaster;
-        curtag->mfact = default_tag->mfact;
+        curtag->nmaster = default_tag.nmaster;
+        curtag->mfact = default_tag.mfact;
 
-        curtag->ltidx[0] = default_tag->lt[0];
-        if (!curtag->ltidx[0]) {
-            curtag->ltidx[0] = m->lt[0];
-        }
-        curtag->ltidx[1] = default_tag->lt[1];
-        if (!curtag->ltidx[1]) {
-            curtag->ltidx[1] = m->lt[1];
-        }
+        curtag->ltidx[0] = &layouts[default_tag.start_layout];
+        curtag->ltidx[1] = &layouts[default_tag.start_layout];
 
-        curtag->showbar = default_tag->showbar;
+        curtag->showbar = default_tag.showbar;
+
+        curtag->gappih = default_tag.gappih;
+        curtag->gappiv = default_tag.gappiv;
+        curtag->gappoh = default_tag.gappoh;
+        curtag->gappov = default_tag.gappov;
 #else
         curtag->nmaster = m->nmaster;
         curtag->mfact = m->mfact;
@@ -1155,6 +1165,11 @@ gettag(Monitor *m) {
         curtag->ltidx[1] = m->lt[1];
 
         curtag->showbar = m->showbar;
+
+        curtag->gappih = m->gappih;
+        curtag->gappiv = m->gappiv;
+        curtag->gappoh = m->gappoh;
+        curtag->gappov = m->gappov;
 #endif
 
         curtag->sellt = m->sellt;
@@ -1253,6 +1268,83 @@ incnmaster(const Arg *arg)
     TagTree *seltag = gettag(selmon);
     seltag->nmaster = selmon->nmaster;
     arrange(selmon);
+}
+
+static void
+incrgaps(const Arg *arg)
+{
+	setgaps(
+		selmon->gappoh + arg->i,
+		selmon->gappov + arg->i,
+		selmon->gappih + arg->i,
+		selmon->gappiv + arg->i
+	);
+}
+
+static void
+incrigaps(const Arg *arg)
+{
+	setgaps(
+		selmon->gappoh,
+		selmon->gappov,
+		selmon->gappih + arg->i,
+		selmon->gappiv + arg->i
+	);
+}
+
+static void
+incrogaps(const Arg *arg)
+{
+	setgaps(
+		selmon->gappoh + arg->i,
+		selmon->gappov + arg->i,
+		selmon->gappih,
+		selmon->gappiv
+	);
+}
+
+static void
+incrohgaps(const Arg *arg)
+{
+	setgaps(
+		selmon->gappoh + arg->i,
+		selmon->gappov,
+		selmon->gappih,
+		selmon->gappiv
+	);
+}
+
+static void
+incrovgaps(const Arg *arg)
+{
+	setgaps(
+		selmon->gappoh,
+		selmon->gappov + arg->i,
+		selmon->gappih,
+		selmon->gappiv
+	);
+}
+
+static void
+incrihgaps(const Arg *arg)
+{
+	setgaps(
+		selmon->gappoh,
+		selmon->gappov,
+		selmon->gappih + arg->i,
+		selmon->gappiv
+	);
+}
+
+static void
+incrivgaps(const Arg *arg)
+{
+	setgaps(
+		selmon->gappoh,
+		selmon->gappov,
+		selmon->gappih,
+		selmon->gappiv + arg->i
+	);
 }
 
 #ifdef XINERAMA
@@ -1846,6 +1938,26 @@ setfullscreen(Client *c, int fullscreen)
     }
 }
 
+static void
+setgaps(int oh, int ov, int ih, int iv)
+{
+	if (oh < 0) oh = 0;
+	if (ov < 0) ov = 0;
+	if (ih < 0) ih = 0;
+	if (iv < 0) iv = 0;
+
+	selmon->gappoh = oh;
+	selmon->gappov = ov;
+	selmon->gappih = ih;
+	selmon->gappiv = iv;
+    TagTree *curtag = gettag(selmon);
+    curtag->gappih = ih;
+    curtag->gappiv = iv;
+    curtag->gappoh = oh;
+    curtag->gappov = ov;
+	arrange(selmon);
+}
+
 int
 stackpos(const Arg *arg) {
     int n, i;
@@ -2108,15 +2220,33 @@ tagdefaultssys(Monitor *m)
     }
     m->pertag->root = ecalloc(1, sizeof(TagTree));
     for (int i = 0; i < LENGTH(tags_defaults); i++) {
-        m->tagset[m->seltags] = tags_defaults[i].tag & TAGMASK;
-        TagTree *t = gettag(m);
-        t->nmaster = tags_defaults[i].nmaster;
-        t->mfact = tags_defaults[i].mfact;
-        t->showbar = tags_defaults[i].showbar;
-        t->ltidx[0] = &layouts[tags_defaults[i].start_layout];
-        t->ltidx[1] = &layouts[tags_defaults[i].start_layout];
+        if ((m->num == tags_defaults[i].mnum) || 
+                (tags_defaults[i].mnum < 0)){
+
+            m->tagset[m->seltags] = tags_defaults[i].tag & TAGMASK;
+            TagTree *t = gettag(m);
+            t->nmaster = tags_defaults[i].nmaster;
+            t->mfact = tags_defaults[i].mfact;
+            t->showbar = tags_defaults[i].showbar;
+            t->ltidx[0] = &layouts[tags_defaults[i].start_layout];
+            t->ltidx[1] = &layouts[tags_defaults[i].start_layout];
+            t->gappih = tags_defaults[i].gappih;
+            t->gappiv = tags_defaults[i].gappiv;
+            t->gappoh = tags_defaults[i].gappoh;
+            t->gappov = tags_defaults[i].gappov;
+        }
     }
     m->tagset[m->seltags] = tmptag;
+    TagTree *curtag = gettag(m);
+    m->mfact = curtag->mfact;
+    m->nmaster = curtag->nmaster;
+    m->showbar = curtag->showbar;
+    m->lt[0] = curtag->ltidx[0];
+    m->lt[1] = curtag->ltidx[1];
+    m->gappih = curtag->gappih;
+    m->gappiv = curtag->gappiv;
+    m->gappoh = curtag->gappoh;
+    m->gappov = curtag->gappov;
 }
 
     void
@@ -2157,6 +2287,13 @@ togglefullscr(const Arg *arg)
 {
     if(selmon->sel)
         setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
+}
+
+static void
+togglegaps(const Arg *arg)
+{
+	enablegaps = !enablegaps;
+	arrange(NULL);
 }
 
     void
@@ -2238,6 +2375,10 @@ toggleview(const Arg *arg)
         selmon->sellt = seltag->sellt;
         selmon->lt[selmon->sellt] = seltag->ltidx[selmon->sellt];
         selmon->lt[selmon->sellt^1] = seltag->ltidx[selmon->sellt^1];
+        selmon->gappih = seltag->gappih;
+        selmon->gappiv = seltag->gappiv;
+        selmon->gappoh = seltag->gappoh;
+        selmon->gappov = seltag->gappov;
 
         if (selmon->showbar != seltag->showbar)
             togglebar(NULL);
@@ -2401,6 +2542,7 @@ updategeom(void)
                 {
                     dirty = 1;
                     m->num = i;
+                    tagdefaultssys(m);
                     m->mx = m->wx = unique[i].x_org;
                     m->my = m->wy = unique[i].y_org;
                     m->mw = m->ww = unique[i].width;
@@ -2427,8 +2569,10 @@ updategeom(void)
     } else
 #endif /* XINERAMA */
     { /* default monitor setup */
-        if (!mons)
+        if (!mons) {
             mons = createmon();
+            tagdefaultssys(mons);
+        }
         if (mons->mw != sw || mons->mh != sh) {
             dirty = 1;
             mons->mw = mons->ww = sw;
@@ -2586,6 +2730,10 @@ view(const Arg *arg)
     selmon->sellt = seltag->sellt;
     selmon->lt[selmon->sellt] = seltag->ltidx[selmon->sellt];
     selmon->lt[selmon->sellt^1] = seltag->ltidx[selmon->sellt^1];
+    selmon->gappih = seltag->gappih;
+    selmon->gappiv = seltag->gappiv;
+    selmon->gappoh = seltag->gappoh;
+    selmon->gappov = seltag->gappov;
 
     if (selmon->showbar != seltag->showbar)
         togglebar(NULL);

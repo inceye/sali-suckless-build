@@ -85,22 +85,29 @@ static const Layout layouts[] = {
     { NULL,		NULL },
 };
 
-#define START_DEFAULT 0
+// If you wish to use the default tag settings for new tags instead of
+// current monitor settings, set START_DEFAULT to 1. With START_DEFAULT
+// set to 0 if you for example have your layout on 1st tag set to 
+// deck and you have not used 1+2 tag before, if you toggle 2nd tag,
+// your layout will automatically be deck
+#define START_DEFAULT 0 
+// With START_DEFAULT set to 1 you have to define default_tag
 static const TagTree default_tag = 
-{ 0,      nmaster,    mfact,      showbar,   0 };
+{ 0,    - 1,    nmaster,    mfact,      showbar,   0,   gappih, gappiv, gappoh, gappov };
 
+// Settings that will be applied on startup or on tagdefaults call
 static const TagTree tags_defaults[] = {
-    /*  tag     nmaster     mfact       showbar     layout*/
-    { ~0,       nmaster,    mfact,      0,          8 },
-    { 1,        nmaster,    mfact,      showbar,    0 },
-    { 2,        nmaster,    mfact,      showbar,    0 },
-    { 4,        nmaster,    mfact,      showbar,    0 },
-    { 8,        nmaster,    mfact,      showbar,    0 },
-    { 16,       nmaster,    mfact,      showbar,    0 },
-    { 32,       nmaster,    mfact,      showbar,    0 },
-    { 64,       nmaster,    mfact,      showbar,    0 },
-    { 128,      nmaster,    mfact,      showbar,    0 },
-    { 256,      nmaster,    mfact,      showbar,    0 },
+    /*  tag monitor nmaster     mfact       showbar     layout  ih      iv      oh      ov gaps*/
+    { ~0,   - 1,    nmaster,    mfact,      0,          8,  gappih, gappiv, gappoh, gappov },
+    { 1,    - 1,    nmaster,    mfact,      showbar,    0,  gappih, gappiv, gappoh, gappov },
+    { 2,    - 1,    nmaster,    mfact,      showbar,    0,  gappih, gappiv, gappoh, gappov },
+    { 4,    - 1,    nmaster,    mfact,      showbar,    0,  gappih, gappiv, gappoh, gappov },
+    { 8,    - 1,    nmaster,    mfact,      showbar,    0,  gappih, gappiv, gappoh, gappov },
+    { 16,   - 1,    nmaster,    mfact,      showbar,    0,  gappih, gappiv, gappoh, gappov },
+    { 32,   - 1,    nmaster,    mfact,      showbar,    0,  gappih, gappiv, gappoh, gappov },
+    { 64,   - 1,    nmaster,    mfact,      showbar,    0,  gappih, gappiv, gappoh, gappov },
+    { 128,  - 1,    nmaster,    mfact,      showbar,    0,  gappih, gappiv, gappoh, gappov },
+    { 256,  - 1,    nmaster,    mfact,      showbar,    0,  gappih, gappiv, gappoh, gappov },
 };
 
 /* key definitions */
