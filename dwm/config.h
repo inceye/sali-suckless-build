@@ -26,10 +26,17 @@ static char normfgcolor[]           = "#cccccc";
 static char selfgcolor[]            = "#ffffff";
 static char selbordercolor[]        = "#707020";
 static char selbgcolor[]            = "#104840";
-static char *colors[][3] = {
+static const unsigned int baralpha = 0xb0;
+static const unsigned int borderalpha = OPAQUE;
+static const char *colors[][3] = {
     /*               fg           bg           border   */
     [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
     [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
+};
+static const unsigned int alphas[][3]      = {
+	/*               fg      bg        border     */
+	[SchemeNorm] = { OPAQUE, baralpha, borderalpha },
+	[SchemeSel]  = { OPAQUE, baralpha, borderalpha },
 };
 
 typedef struct {
