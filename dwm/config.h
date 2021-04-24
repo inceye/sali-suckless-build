@@ -141,6 +141,7 @@ static const TagTree tags_defaults[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, "-l", "10", "-i", NULL };
 static const char *termcmd[]  = { TERMINAL, NULL };
+static const char *layoutmenu_cmd = "layoutmenu.sh";
 
 #include <X11/XF86keysym.h>
 #include "shiftview.c"
@@ -321,6 +322,7 @@ static Key keys[] = {
 static Button buttons[] = {
     /* click                event mask      button          function        argument */
 #ifndef __OpenBSD__
+	{ ClkLtSymbol,          0,              Button3,        layoutmenu,     {0} },
     { ClkWinTitle,          0,              Button2,        zoom,           {0} },
     { ClkStatusText,        0,              Button1,        sigdwmblocks,   {.i = 1} },
     { ClkStatusText,        0,              Button2,        sigdwmblocks,   {.i = 2} },
