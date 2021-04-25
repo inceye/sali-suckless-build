@@ -1,2 +1,24 @@
 #!/bin/sh
-dmenu_path | dmenu "$@" | ${SHELL:-"/bin/sh"} &
+
+confdir="$HOME/.config/dmenu_run"
+histlimit=1000
+mkdir  --parents "$confdir"
+touch "$confdir/bookmarks"
+touch "$confdir/history"
+
+runnables="$(dmenu_path)"
+sortedhist="$(sort "$confdir/history" | uniq -c | sort -n -r | awk '{print $2}')"
+
+selections="$( (cat "$confdir/bookmarks"; echo "$sortedhist"; echo "$runnables") | dmenu "$@")"
+
+for i in $selections
+do
+    if [ "$(echo "$runnables" | grep "$i")" = "$i" ]
+    then
+        echo "$i" >> "$confdir/history"
+        echo "$i" | ${SHELL:-"/bin/sh"} &
+    fi
+done
+
+newhist="$(cat "$confdir/history")"
+echo "$newhist" | tail "-$histlimit" > "$confdir/history"
