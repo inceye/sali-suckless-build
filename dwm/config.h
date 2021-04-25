@@ -74,6 +74,7 @@ static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] 
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
+#define WARP_CURSOR 1 /* warp cursor to the middle of window on focus */
 #include "vanitygaps.c"
 static const Layout layouts[] = {
     /* symbol     arrange function */
