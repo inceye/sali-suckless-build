@@ -623,8 +623,8 @@ buttonpress(XEvent *e)
 	}
 	if (ev->button != Button1)
 		return;
-	if (ev->state & ~ControlMask)
-		return;
+	//if (ev->state & ~ControlMask) // I have no idea why this was here
+		//return;                   // And it kinda messed everything up
 	if (lines > 0) {
 		/* vertical list: (ctrl)left-click on item */
 		w = mw - x;
