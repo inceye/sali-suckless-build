@@ -1086,6 +1086,9 @@ focusstack(const Arg *arg)
             i -= ISVISIBLE(c) ? 1 : 0, p = c, c = c->next);
     focus(c ? c : p);
     restack(selmon);
+#if NO_WARP_ON_CONFIG
+    warp(selmon->sel);
+#endif
 }
 
     Atom
@@ -1597,6 +1600,9 @@ movemouse(const Arg *arg)
     if (c->isfullscreen) /* no support moving fullscreen windows by mouse */
         return;
     restack(selmon);
+#if NO_WARP_ON_CONFIG
+    warp(selmon->sel);
+#endif
     ocx = c->x;
     ocy = c->y;
     if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
@@ -1657,6 +1663,10 @@ pop(Client *c)
     attach(c);
     focus(c);
     arrange(c->mon);
+#if NO_WARP_ON_CONFIG
+	if (c->mon == selmon && (c->mon->tagset[c->mon->seltags] & c->mon->sel->tags))
+        warp(c->mon->sel);
+#endif
 }
 
 void
@@ -1680,6 +1690,9 @@ pushstack(const Arg *arg) {
         c->next = sel;
     }
     arrange(selmon);
+#if NO_WARP_ON_CONFIG
+    warp(selmon->sel);
+#endif
 }
 
     void
@@ -1865,8 +1878,10 @@ restack(Monitor *m)
     XSync(dpy, False);
     while (XCheckMaskEvent(dpy, EnterWindowMask, &ev)) {}
 
-	if (m == selmon && (m->tagset[m->seltags] & m->sel->tags) && selmon->lt[selmon->sellt] != &layouts[2])
+#if !NO_WARP_ON_CONFIG
+	if (m == selmon && (m->tagset[m->seltags] & m->sel->tags))
 		warp(m->sel);
+#endif
 }
 
     void
@@ -2065,8 +2080,12 @@ setlayout(const Arg *arg)
     seltag->ltidx[selmon->sellt] = selmon->lt[selmon->sellt];
     seltag->sellt = selmon->sellt;
 
-    if (selmon->sel)
+    if (selmon->sel) {
         arrange(selmon);
+#if WARP_ON_LAYOUT
+        warp(selmon->sel);
+#endif
+    }
     else
         drawbar(selmon);
 }
@@ -2456,6 +2475,9 @@ toggleview(const Arg *arg)
 
         focus(NULL);
         arrange(selmon);
+#if WARP_ON_VIEW
+        warp(selmon->sel);
+#endif
     }
 }
 
@@ -2813,6 +2835,9 @@ view(const Arg *arg)
 
     focus(NULL);
     arrange(selmon);
+#if WARP_ON_VIEW
+    warp(selmon->sel);
+#endif
 }
 
 void

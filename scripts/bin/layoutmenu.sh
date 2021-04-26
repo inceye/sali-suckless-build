@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cat <<EOF | xmenu
+cat <<EOF | dmenu -l 10
 0  []= Tiled Layout
 1  TTT Bottomstack Layout
 2  [@] Spiral Layout

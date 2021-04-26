@@ -76,6 +76,9 @@ static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
 #define WARP_CURSOR 1 /* warp cursor to the middle of window on focus */
+#define NO_WARP_ON_CONFIG 1 /* don't warp if focus did not change */
+#define WARP_ON_LAYOUT 0 /* Warp on layout change if window shifted off */
+#define WARP_ON_VIEW 0 /* Warp on view change */
 #include "vanitygaps.c"
 static const Layout layouts[] = {
     /* symbol     arrange function */
@@ -325,7 +328,7 @@ static Button buttons[] = {
     /* click                event mask      button          function        argument */
 #ifndef __OpenBSD__
 	{ ClkButton,		    0,		        Button1,	    spawn,		    {.v = dmenucmd } },
-	{ ClkLtSymbol,          0,              Button3,        layoutmenu,     {0} },
+	{ ClkLtSymbol,          0,              Button1,        layoutmenu,     {0} },
     { ClkWinTitle,          0,              Button2,        zoom,           {0} },
     { ClkStatusText,        0,              Button1,        sigdwmblocks,   {.i = 1} },
     { ClkStatusText,        0,              Button2,        sigdwmblocks,   {.i = 2} },
