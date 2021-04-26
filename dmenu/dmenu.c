@@ -259,10 +259,26 @@ grabkeyboard(void)
 	for (i = 0; i < 1000; i++) {
 		if (XGrabKeyboard(dpy, DefaultRootWindow(dpy), True, GrabModeAsync,
 		                  GrabModeAsync, CurrentTime) == GrabSuccess)
-			return;
+			break;
 		nanosleep(&ts, NULL);
 	}
-	die("cannot grab keyboard");
+    if (i >= 1000) {
+        die("cannot grab keyboard");
+    }
+    for (; i < 2000; i++) {
+        if (XGrabPointer(dpy,DefaultRootWindow(dpy), True, ButtonPressMask |
+                    ButtonReleaseMask |
+                    PointerMotionMask |
+                    FocusChangeMask |
+                    EnterWindowMask 
+                    ,GrabModeAsync,GrabModeAsync, None, None, CurrentTime) == GrabSuccess) {
+                break;
+        }
+		nanosleep(&ts, NULL);
+    }
+    if (i >= 2000) {
+        die("cannot grab mouse");
+    }
 }
 
 static void
@@ -577,7 +593,7 @@ buttonpress(XEvent *e)
 	int x = 0, y = 0, h = bh, w;
 
 	if (ev->window != win)
-		return;
+		exit(1);
 
 	/* right-click: exit */
 	if (ev->button == Button3)
