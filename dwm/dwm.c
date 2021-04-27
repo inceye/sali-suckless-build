@@ -156,6 +156,8 @@ struct Monitor {
     int gappiv;           /* vertical gap between windows */
     int gappoh;           /* horizontal outer gaps */
     int gappov;           /* vertical outer gaps */
+    static int vp;        /* vertical padding for bar */
+    static int sp;        /* side padding for bar */
     unsigned int seltags;
     unsigned int sellt;
     unsigned int tagset[2];
@@ -373,6 +375,8 @@ struct TagTree {
     int gappiv;                 /* vertical gap between windows */
     int gappoh;                 /* horizontal outer gaps */
     int gappov;                 /* vertical outer gaps */
+    int vp;                     /* vertical padding for bar */
+    int sp;                     /* side padding for bar */
     const Layout *ltidx[2];     /* matrix of tags and layouts indexes  */
     unsigned int sellt;         /* selected layout */
     bool is_init;

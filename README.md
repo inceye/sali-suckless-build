@@ -41,7 +41,8 @@ This is [OUR](https://en.wikipedia.org/wiki/Soviet_Union) build of the following
 
 * Tab utility to add tabs to any program you want [Tabbed](tabbed)
 
-    A restyled fork of [the original tabbed utility](https://tools.suckless.org/tabbed/) by suckless with several patches:
+    A restyled fork of [the original tabbed utility](https://tools.suckless.org/tabbed/) 
+    by suckless with several patches:
 
     * [Addition of client number to the tab](https://tools.suckless.org/tabbed/patches/clientnumber/)
     * [Automatic tab hiding when not pressing the keybinds](https://tools.suckless.org/tabbed/patches/hidetabs/)
@@ -49,10 +50,25 @@ This is [OUR](https://en.wikipedia.org/wiki/Soviet_Union) build of the following
  
 * Window manager [DWM](dwm)
 
-    A restyled fork of [LukeSmithXYZ's build of DWM](https://github.com/LukeSmithxyz/dwm) with two patches:
+    A decimated fork of [LukeSmithXYZ's build of DWM](https://github.com/LukeSmithxyz/dwm) 
+    with so many patches that it is not even obvious LukeSmith created the 
+    initial version of this :
 
     * [Unique settings for different tags](https://dwm.suckless.org/patches/pertag/)
+        with my own addition of different settings for any combination of
+        tags as well. Also I added gaps to the list of things that are
+        unique for each tag.
     * [Display status on all connected monitors](https://dwm.suckless.org/patches/statusallmons/)
+    * [Gapless grid]() but with gaps
+    * [Winview]()
+    * [Bar height]()
+    * [Bar padding]()
+    * [Bar alpha]()
+    * [Layout menu]()
+    * [Warp]() but with more customizability to prevent cursor warping when
+        it is not something you want.
+    * [Status button]()
+    * [Resize corners]()
 
 * Status for it [DWMBlocks](dwmblocks)
     A restyled fork of [LukesmithXYZ's build of DWMblocks](https://github.com/lukesmithxyz/dwmblocks), with a couple of my own scripts
