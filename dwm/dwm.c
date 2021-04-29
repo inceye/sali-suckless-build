@@ -156,8 +156,8 @@ struct Monitor {
     int gappiv;           /* vertical gap between windows */
     int gappoh;           /* horizontal outer gaps */
     int gappov;           /* vertical outer gaps */
-    static int vp;        /* vertical padding for bar */
-    static int sp;        /* side padding for bar */
+    int vp;        /* vertical padding for bar */
+    int sp;        /* side padding for bar */
     unsigned int seltags;
     unsigned int sellt;
     unsigned int tagset[2];
