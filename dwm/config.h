@@ -328,6 +328,7 @@ static Button buttons[] = {
     /* click                event mask      button          function        argument */
 #ifndef __OpenBSD__
 	{ ClkButton,		    0,		        Button1,	    spawn,		    {.v = dmenucmd } },
+	{ ClkButton,		    0,		        Button3,	    spawn,		    SHCMD("sysact") },
 	{ ClkLtSymbol,          0,              Button1,        layoutmenu,     {0} },
     { ClkWinTitle,          0,              Button2,        zoom,           {0} },
     { ClkStatusText,        0,              Button1,        sigdwmblocks,   {.i = 1} },

@@ -1,0 +1,64 @@
+#!/bin/bash
+
+dirlimit="/"
+indir="$HOME"
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+    key="$1"
+    case $key in
+        -dd|--defaultdir)
+            indir=$2
+            shift
+            shift
+            ;;
+        -dl|--dirlimit)
+            dirlimit=$2
+            shift
+            shift
+            ;;
+        -h|--help)
+            echo "HELP"
+            exit
+            ;;
+        *)
+            POSITIONAL+=("$1")
+            shift
+            ;;
+    esac
+done
+
+cd "$indir" || exit
+
+while [[ "$(pwd)" = "$dirlimit"* ]] 
+do
+    opt="$( (ls -a) | dmenu "${POSITIONAL[@]}" )"
+
+    if [ "$opt" = "." ]
+    then
+        pwd
+        break
+    fi
+                
+    if [ "$(echo "$opt" | wc -l)" = "1" ]
+    then
+        if [ "$(file "$opt" -b)" = "directory" ]
+        then
+            cd "$opt" && continue
+            exit
+        fi
+
+        if [[ "$(file "$opt" -b)" = "symbolic link"* ]]
+        then
+            cd "$opt" && continue
+            readlink -f "$opt"
+            break
+        fi
+    fi
+    for i in $opt
+    do
+        readlink -f "$i"
+    done
+    break
+done
