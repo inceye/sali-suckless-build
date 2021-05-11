@@ -329,7 +329,8 @@ static Button buttons[] = {
 #ifndef __OpenBSD__
 	{ ClkButton,		    0,		        Button1,	    spawn,		    {.v = dmenucmd } },
 	{ ClkButton,		    0,		        Button3,	    spawn,		    SHCMD("sysact") },
-	{ ClkLtSymbol,          0,              Button1,        layoutmenu,     {0} },
+	{ ClkLtSymbol,          0,              Button1,        togglevacant,   {0} },
+	{ ClkLtSymbol,          0,              Button3,        layoutmenu,     {0} },
     { ClkWinTitle,          0,              Button2,        zoom,           {0} },
     { ClkStatusText,        0,              Button1,        sigdwmblocks,   {.i = 1} },
     { ClkStatusText,        0,              Button2,        sigdwmblocks,   {.i = 2} },

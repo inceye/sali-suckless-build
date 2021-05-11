@@ -164,6 +164,7 @@ struct Monitor {
     unsigned int tagset[2];
     int showbar;
     int topbar;
+    bool drawvacant;
     Client *clients;
     Client *sel;
     Client *stack;
@@ -284,6 +285,7 @@ static void togglesticky(const Arg *arg);
 static void togglefullscr(const Arg *arg);
 static void togglegaps(const Arg *arg);
 static void toggletag(const Arg *arg);
+static void togglevacant(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
 static void unmanage(Client *c, int destroyed);
@@ -612,9 +614,11 @@ buttonpress(XEvent *e)
             for (c = m->clients; c; c = c->next)
                 occ |= c->tags == 255 ? 0 : c->tags;
             do {
-                /* do not reserve space for vacant tags */
-                if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
-                    continue;
+                if (!m->drawvacant) {
+                    /* do not reserve space for vacant tags */
+                    if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
+                        continue;
+                }
                 x += TEXTW(tags[i]);
             } while (ev->x >= x && ++i < LENGTH(tags));
             if (i < LENGTH(tags)) {
@@ -861,6 +865,7 @@ createmon(void)
     strncpy(m->ltsymbol, layouts[0].symbol, sizeof m->ltsymbol);
     m->pertag = ecalloc(1, sizeof(Pertag));
     m->pertag->curtag = m->pertag->prevtag = 1;
+    m->drawvacant = false;
 
     return m;
 }
@@ -948,9 +953,11 @@ drawbar(Monitor *m)
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, buttonbar, 0);
     for (i = 0; i < LENGTH(tags); i++) {
-        /* do not draw vacant tags */
-        if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
-            continue;
+        if (!m->drawvacant) {
+            /* do not draw vacant tags */
+            if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
+                continue;
+        }
 
         w = TEXTW(tags[i]);
         drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
@@ -2439,6 +2446,13 @@ toggletag(const Arg *arg)
         focus(NULL);
         arrange(selmon);
     }
+}
+
+    void
+togglevacant(const Arg *arg)
+{
+    selmon->drawvacant ^= 1;
+    arrange(selmon);
 }
 
     void
