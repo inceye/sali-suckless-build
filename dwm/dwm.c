@@ -66,6 +66,7 @@
 #define NUMTAGS			(LENGTH(tags) + LENGTH(scratchpads))
 #define OPAQUE                  0xffU
 #define TAGMASK			((1 << NUMTAGS) - 1)
+#define TAGMASK_NOSCRATCH (((1 << LENGTH(tags)) - 1))
 #define SPTAG(i)		((1 << LENGTH(tags)) << (i))
 #define SPTAGMASK		(((1 << LENGTH(scratchpads))-1) << LENGTH(tags))
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
@@ -1156,7 +1157,7 @@ getrootptr(int *x, int *y)
 
 TagTree *
 gettag(Monitor *m) {
-    unsigned int curtagnum = m->tagset[m->seltags] & TAGMASK;
+    unsigned int curtagnum = m->tagset[m->seltags] & TAGMASK_NOSCRATCH;
     unsigned int tagnum = curtagnum;
     TagTree *curtag = m->pertag->root;
     while (curtagnum) {
