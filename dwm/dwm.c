@@ -1156,7 +1156,7 @@ getrootptr(int *x, int *y)
 
 TagTree *
 gettag(Monitor *m) {
-    unsigned int curtagnum = m->tagset[m->seltags];
+    unsigned int curtagnum = m->tagset[m->seltags] & TAGMASK;
     unsigned int tagnum = curtagnum;
     TagTree *curtag = m->pertag->root;
     while (curtagnum) {

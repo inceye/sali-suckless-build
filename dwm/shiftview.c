@@ -15,10 +15,10 @@ shiftview(const Arg *arg)
 
 	do {
 		if(i > 0) // left circular shift
-			nextseltags = (curseltags << i) | (curseltags >> (LENGTH(tags) - i));
+			nextseltags = ((curseltags << i) | (curseltags >> (LENGTH(tags) - i))) & TAGMASK;
 
 		else // right circular shift
-			nextseltags = curseltags >> (- i) | (curseltags << (LENGTH(tags) + i));
+			nextseltags = (curseltags >> (- i) | (curseltags << (LENGTH(tags) + i))) & TAGMASK;
 
                 // Check if tag is visible
 		for (c = selmon->clients; c && !visible; c = c->next)
@@ -30,7 +30,7 @@ shiftview(const Arg *arg)
 	} while (!visible && ++count < 10);
 
 	if (count < 10) {
-		a.i = nextseltags;
+		a.ui = nextseltags;
 		view(&a);
 	}
 }
@@ -47,10 +47,10 @@ shifttag(const Arg *arg)
 
 	do {
 		if(i > 0) // left circular shift
-			nextseltags = (curseltags << i) | (curseltags >> (LENGTH(tags) - i));
+			nextseltags = ((curseltags << i) | (curseltags >> (LENGTH(tags) - i))) & TAGMASK;
 
 		else // right circular shift
-			nextseltags = curseltags >> (- i) | (curseltags << (LENGTH(tags) + i));
+			nextseltags = (curseltags >> (- i) | (curseltags << (LENGTH(tags) + i))) & TAGMASK;
 
                 // Check if tag is visible
 		for (c = selmon->clients; c && !visible; c = c->next)
@@ -62,7 +62,7 @@ shifttag(const Arg *arg)
 	} while (!visible && ++count < 10);
 
 	if (count < 10) {
-		a.i = nextseltags;
+		a.ui = nextseltags;
 		tag(&a);
 	}
 }
