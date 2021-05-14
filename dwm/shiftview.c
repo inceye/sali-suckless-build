@@ -11,7 +11,7 @@ shiftview(const Arg *arg)
 	unsigned visible = 0;
 	int i = arg->i;
 	int count = 0;
-	int nextseltags, curseltags = selmon->tagset[selmon->seltags];
+	int nextseltags, curseltags = selmon->tagset[selmon->seltags] & TAGMASK_NOSCRATCH;
 
 	do {
 		if(i > 0) // left circular shift
@@ -43,7 +43,7 @@ shifttag(const Arg *arg)
 	unsigned visible = 0;
 	int i = arg->i;
 	int count = 0;
-	int nextseltags, curseltags = selmon->tagset[selmon->seltags];
+	int nextseltags, curseltags = selmon->tagset[selmon->seltags] & TAGMASK_NOSCRATCH;
 
 	do {
 		if(i > 0) // left circular shift
