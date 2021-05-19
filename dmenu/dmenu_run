@@ -13,7 +13,7 @@ selections="$( (cat "$confdir/bookmarks"; echo "$sortedhist"; echo "$runnables")
 
 for i in $selections
 do
-    if [ "$(echo "$runnables" | grep "$i")" = "$i" ]
+    if [ "$(echo "$runnables" | grep "^$i$" | head -1)" = "$i" ]
     then
         echo "$i" >> "$confdir/history"
         echo "$i" | ${SHELL:-"/bin/sh"} &
