@@ -274,7 +274,7 @@ static Key keys[] = {
     { MODKEY,			    XK_Return,	    spawn,		    {.v = termcmd } },
     { MODKEY,			    XK_d,		    spawn,          {.v = dmenucmd } },
 
-    { MODKEY,			    XK_asciitilde,	spawn,	        SHCMD("dmenuunicode") },
+    { MODKEY,			    XK_grave,	    spawn,	        SHCMD("dmenuunicode") },
     { MODKEY,			    XK_w,		    spawn,		    SHCMD("$BROWSER") },
     { MODKEY,			    XK_o,			spawn,		    SHCMD("dmenupass") },
     { MODKEY,			    XK_r,			spawn,		    SHCMD(TERMINAL " -e ranger") },
