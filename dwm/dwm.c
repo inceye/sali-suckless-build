@@ -159,6 +159,7 @@ struct Monitor {
     int gappov;           /* vertical outer gaps */
     int vp;        /* vertical padding for bar */
     int sp;        /* side padding for bar */
+    // TODO: make bar padding per tag
     unsigned int seltags;
     unsigned int sellt;
     unsigned int tagset[2];
@@ -302,6 +303,7 @@ static void updatewindowtype(Client *c);
 static void updatewmhints(Client *c);
 static void view(const Arg *arg);
 static void warp(const Client *c);
+static void cursorwarp(const Arg *arg);
 static Client *wintoclient(Window w);
 static Monitor *wintomon(Window w);
 static void winview(const Arg* arg);
@@ -2875,12 +2877,33 @@ warp(const Client *c)
 	     y > c->y - c->bw &&
 	     x < c->x + c->w + c->bw*2 &&
 	     y < c->y + c->h + c->bw*2) ||
-	    (y > c->mon->by && y < c->mon->by + bh) ||
+	    (y > c->mon->by + vp && y < c->mon->by + vp + bh) ||
 	    (c->mon->topbar && !y))
 		return;
 
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
 #endif
+}
+
+void
+cursorwarp(const Arg *a)
+{
+	int x, y;
+    Client *c = selmon->sel;
+
+	if (!c) {
+		XWarpPointer(dpy, None, root, 0, 0, 0, 0, selmon->wx + selmon->ww/2, selmon->wy + selmon->wh/2);
+		return;
+	}
+
+	if (!getrootptr(&x, &y) ||
+	    (x > c->x - c->bw &&
+	     y > c->y - c->bw &&
+	     x < c->x + c->w + c->bw*2 &&
+	     y < c->y + c->h + c->bw*2))
+		return;
+
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
 }
 
     pid_t
