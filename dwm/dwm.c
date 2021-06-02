@@ -66,7 +66,6 @@
 #define NUMTAGS			(LENGTH(tags) + LENGTH(scratchpads))
 #define OPAQUE                  0xffU
 #define TAGMASK			((1 << NUMTAGS) - 1)
-#define TAGMASK_NOSCRATCH (((1 << LENGTH(tags)) - 1))
 #define SPTAG(i)		((1 << LENGTH(tags)) << (i))
 #define SPTAGMASK		(((1 << LENGTH(scratchpads))-1) << LENGTH(tags))
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)

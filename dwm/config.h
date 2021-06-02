@@ -333,8 +333,8 @@ static Button buttons[] = {
 	{ ClkLtSymbol,          0,              Button3,        layoutmenu,     {0} },
     { ClkWinTitle,          0,              Button1,        cursorwarp,     {0} },
     { ClkWinTitle,          0,              Button2,        zoom,           {0} },
-    { ClkWinTitle,          0,              Button4,        focusstack,     {- 1} },
-    { ClkWinTitle,          0,              Button5,        focusstack,     {+ 1} },
+    { ClkWinTitle,          0,              Button4,        focusstack,     {.i = INC(- 1)} },
+    { ClkWinTitle,          0,              Button5,        focusstack,     {.i = INC(+ 1)} },
     { ClkStatusText,        0,              Button1,        sigdwmblocks,   {.i = 1} },
     { ClkStatusText,        0,              Button2,        sigdwmblocks,   {.i = 2} },
     { ClkStatusText,        0,              Button3,        sigdwmblocks,   {.i = 3} },
@@ -354,5 +354,7 @@ static Button buttons[] = {
     { ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
     { ClkTagBar,		    0,		        Button4,	    shiftview,	    {.i = -1} },
     { ClkTagBar,		    0,		        Button5,	    shiftview,	    {.i = 1} },
+    { ClkRootWin,		    0,		        Button1,	    movemouse,	    {0} },
     { ClkRootWin,		    0,		        Button2,	    togglebar,	    {0} },
+    { ClkRootWin,		    0,		        Button3,	    resizemouse,	{0} },
 };

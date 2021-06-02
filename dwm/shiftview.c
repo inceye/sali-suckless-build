@@ -1,3 +1,4 @@
+#define TAGMASK_NOSCRATCH (((1 << LENGTH(tags)) - 1))
 /** Function to shift the current view to the left/right
  *
  * @param: "arg->i" stores the number of tags to shift right (positive value)
@@ -11,14 +12,22 @@ shiftview(const Arg *arg)
 	unsigned visible = 0;
 	int i = arg->i;
 	int count = 0;
-	int nextseltags, curseltags = selmon->tagset[selmon->seltags] & TAGMASK_NOSCRATCH;
+	int nextseltags = 0;
+    int curseltags = selmon->tagset[selmon->seltags];
+    curseltags &= TAGMASK_NOSCRATCH;
 
 	do {
 		if(i > 0) // left circular shift
-			nextseltags = ((curseltags << i) | (curseltags >> (LENGTH(tags) - i))) & TAGMASK_NOSCRATCH;
+			nextseltags = (
+                    (curseltags << i) | 
+                    (curseltags >> (LENGTH(tags) - i))
+                    ) & TAGMASK_NOSCRATCH;
 
 		else // right circular shift
-			nextseltags = (curseltags >> (- i) | (curseltags << (LENGTH(tags) + i))) & TAGMASK_NOSCRATCH;
+			nextseltags = (
+                    (curseltags >> (- i)) | 
+                    (curseltags << (LENGTH(tags) + i))
+                    ) & TAGMASK_NOSCRATCH;
 
                 // Check if tag is visible
 		for (c = selmon->clients; c && !visible; c = c->next)
