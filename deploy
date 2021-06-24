@@ -6,15 +6,18 @@ You can only run this script as a user, never as root -- otherwize the script is
 Do you wish to proceed? [Y/n] 
 WARNING: DO NOT END THIS SCRIPT BY PRESSING CTRL+C AS YOUR icanon SETTINGS WILL BE ALTERED. ONLY EXIT BY PRESSING n" 
 
+# Prep w icanon
 saved_tty_settings=$(stty -g)
 stty -icanon min 1 time 0
 
+# Main loop
 while true
 do
   stty -icanon min 1 time 0
   input=$(head -c 1) 
   echo ""
 
+# Confirm case
   case $input in
     [yY])
       echo "Are you sure you wish to install the tools?"
@@ -27,9 +30,12 @@ do
       fi
 
       echo ""
+
+# Make src and share dirs
       mkdir -p ~/.local/src/
       mkdir -p ~/.local/share/
 
+# Remove old dirs
       echo "Removing old configuration from .local"
       rm -Rf .local/src/tabbed
       rm -Rf .local/src/surf
@@ -39,11 +45,14 @@ do
       rm -Rf .local/src/dmenu
       rm -Rf .local/src/slock
 
+# Install upower
       sudo pacman -S upower
 
+# DwmBlocks
       echo "First, we have to configure your dwmblocks"
       dwmblocks_config="$(cat dwmblocks_defconf)"
 
+# volume
       echo "Do you want volume to be in your dwmblocks [Y/n]"
       while true
       do 
@@ -64,6 +73,7 @@ do
         esac
       done
 
+# layout
       echo "Do you want layout to be in your dwmblocks [Y/n]"
       while true
       do 
@@ -85,6 +95,7 @@ do
         esac
       done
 
+# ram
       echo "Do you want RAM to be in your dwmblocks [Y/n]"
       while true
       do 
@@ -105,6 +116,7 @@ do
         esac
       done
 
+# cpu temp
       echo "Do you want your CPU temperature to be in your dwmblocks [Y/n]"
       while true
       do 
@@ -125,6 +137,7 @@ do
         esac
       done
 
+# gpu temp
       echo "Do you want your GPU temperature to be in your dwmblocks [Y/n]"
       while true
       do 
@@ -145,6 +158,7 @@ do
         esac
       done
 
+# disk space
       echo "Do you want your available disk space to be in your dwmblocks [Y/n]"
       while true
       do 
@@ -181,6 +195,7 @@ do
         esac
       done
 
+# battery
       echo "Do you want battery charge to be in your dwmblocks [Y/n]"
       while true
       do 
@@ -220,7 +235,8 @@ do
         esac
       done
 
-      echo "Do you want date to be in your dwmblocks [Y/n]"
+# date
+      echo "Do you want the date displayed in your dwmblocks [Y/n]"
       while true
       do 
         input=$(head -c 1)
@@ -240,7 +256,8 @@ do
         esac
       done
 
-      echo "Do you want time to be in your dwmblocks [Y/n]"
+# time
+      echo "Do you want the time displayed in your dwmblocks [Y/n]"
       while true
       do 
         input=$(head -c 1)
@@ -285,11 +302,11 @@ do
 
       echo "$dwmblocks_config" > dwmblocks/config.h &&
 
-      # Install libxft-bgra for the emojis not to crash dwmblocks
+# Install libxft-bgra for the emojis not to crash dwmblocks
 
       echo "Proceeding to install the dependencies" &&
 
-      # Import gpg key to authorize libxft-bgra
+# Import gpg key to authorize libxft-bgra
       gpg --keyserver pool.sks-keyservers.net --recv-key CFDF148828C642A7 &&
 
       stty "$saved_tty_settings" &&
@@ -302,80 +319,103 @@ do
 
       echo "Suckless tools' installation is initiated" &&
 
-      # Install the suckless software
-      #dwm
+# Install the suckless software
+
+# dwm
       cd dwm &&
       sudo make install &&
       cd .. &&
       cp -r dwm ~/.local/src/ &&
 
-      #dmenu
+# dmenu
       cd dmenu &&
       sudo make install &&
       cd .. &&
       cp -r dmenu ~/.local/src/ &&
 
-      #st
+# st
       cd st &&
       sudo make install &&
       cd .. &&
       cp -r st ~/.local/src/ &&
 
-      #dwmblocks
+# dwmblocks
       cd dwmblocks &&
       sudo make install &&
       cd .. &&
       cp -r dwmblocks ~/.local/src/ &&
 
-      #slock
+# slock
       cd slock &&
       sudo make install &&
       cd .. &&
       cp -r slock ~/.local/src/ &&
 
-      #surf
+# surf
       pacaur -S gst-plugins-good gst-libav &&
       cd surf &&
       sudo make install &&
       cd .. &&
       cp -r surf ~/.local/src/ &&
 
-      #tabbed
+# tabbed
       cd tabbed &&
       sudo make install &&
       cd .. &&
       cp -r tabbed ~/.local/src/ &&
 
-      #scripts
+# scripts
       cp scripts/bin/* ~/.local/bin/ &&
       cp scripts/share/* ~/.local/share/ &&
       
-      # add ~/.local/bin to the PATH variable
+# Add ~/.local/bin to the PATH variable
       export PATH="$PATH:$HOME/.local/bin"
 
       echo "Installation was successfully completed" &&
       break ||
-      echo "There was an ERROR while installing some of the utilities."
-      echo "Removing wrong configuration from .local"
-      rm -Rf .local/src/tabbed
-      rm -Rf .local/src/surf
-      rm -Rf .local/src/st
-      rm -Rf .local/src/dwm
-      rm -Rf .local/src/dwmblocks
-      rm -Rf .local/src/dmenu
-      rm -Rf .local/src/slock
-      echo "Try Again?[Y/n]"
-      ;;
-    [nN])
-      stty "$saved_tty_settings"
-      echo "Aborting"
-      break
-      ;;
-    *)
-      echo "Invalid input, try again"
-      ;;
-	esac
-done
 
+# If encountered error 
+      echo "There was an ERROR while installing some of the utilities."
+      echo "Do you want to remove possibly broken configurations from .local?[Y/N]"
+      while true
+      do 
+        input=$(head -c 1)
+        echo ""
+        case $input in 
+          [yY])
+              echo "Removing wrong configuration from .local"
+              rm -Rf .local/src/tabbed
+              rm -Rf .local/src/surf
+              rm -Rf .local/src/st
+              rm -Rf .local/src/dwm
+              rm -Rf .local/src/dwmblocks
+              rm -Rf .local/src/dmenu
+              rm -Rf .local/src/slock
+              break
+            ;;
+          [nN])
+            break
+            ;;
+          *)
+            echo "Invalid input"
+            ;;
+        esac
+      done
+
+      echo "Try Again?[Y/n]"
+       ;;
+     [nN])
+       stty "$saved_tty_settings"
+       echo "Aborting"
+       break
+       ;;
+     *)
+       echo "Invalid input, try again"
+       ;;
+ 	esac
+ done
+    
+
+# Icanon settings
 echo "Restoring original icanon tty settings"
 stty "$saved_tty_settings"
