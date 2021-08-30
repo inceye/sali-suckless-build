@@ -34,6 +34,7 @@ do
 			# Make src and share dirs
 			mkdir -p ~/.local/src/
 			mkdir -p ~/.local/share/
+			mkdir -p ~/.local/bin/
 
 			# Remove old dirs
 			echo "Removing old configuration from .local"
